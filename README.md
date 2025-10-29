@@ -216,7 +216,8 @@ This project is released under the **MIT License**, meaning:
 * [Tabler.io](https://tabler.io) for the beautiful UI components
 * [Flask](https://flask.palletsprojects.com/) for simplicity and flexibility
 * Educators and cultural activists who preserve Aksara Nusantara
-* Open-source community contributors everywhere 🌏
+* [@cunkmusk](https://x.com/cunkmusk) and [@jauhari](https://x.com/jauhari) — for their valuable insights and design guidance.
+* Open-source community contributors everywhere 🌏 — your shared knowledge makes this project possible.
 
 ---
 

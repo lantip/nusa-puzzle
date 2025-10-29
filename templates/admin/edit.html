@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="card">
+  <div class="card-header"><h3 class="card-title">Edit Crossword</h3></div>
+  <div class="card-body">
+    <form method="POST">
+        <div class="mb-3">
+            <label class="form-label">Title</label>
+            <input type="text" class="form-control" name="title" value="{{ crossword.title }}">
+        </div>
+        <div class="container-xl">
+            <div class="row g-2">
+                <div class="col">
+                    <div style="display: inline-block; border: 2px solid #333;">
+                        <table style="border-collapse: collapse;">
+                            {% for row in preview %}
+                            {% set r = loop.index0 %}
+                            <tr>
+                                {% for cell in row %}            
+                                {% set c = loop.index0 %}
+                                {% if cell == ' ' %}
+                                    <td style="width: 30px; height: 30px; background: #999; border: 1px solid #777;"></td>
+                                {% else %}
+                                    <td style="width: 30px; height: 30px; border: 1px solid #777; position: relative; text-align: center;">
+                                    {% if numbers[r][c] %}
+                                        <div style="position: absolute; top: 2px; left: 3px; font-size: 10px;">
+                                        {{ numbers[r][c] }}
+                                        </div>
+                                    {% endif %}
+                                    <div style="line-height: 30px; color: lightgrey">{{ cell }}</div>
+                                    </td>
+                                {% endif %}
+                                {% endfor %}
+                            </tr>
+                            {% endfor %}
+                        </table>
+                    </div>
+                </div>
+                <div class="col">
+                    <h4>Mendatar</h4>
+                        <ol>
+                        {% for clue in clues.across %}
+                            <li value="{{ clue.number }}">{{ clue.clue |title }}</p>
+                        {% endfor %}
+                        </ol>
+
+                    <h4>Menurun</h4>
+                    <ol>
+                        {% for clue in clues.down %}
+                        <li value="{{ clue.number }}">{{ clue.clue | title}}</p>
+                        {% endfor %}
+                    </ol>
+                </div>
+            </div>
+        </div>
+        <div class="mb-3 text-center">
+            <textarea hidden name="griddata" id="griddata">{{ preview | tojson | safe }}</textarea> 
+            <textarea hidden name="wordlist" id="wordlist">{{ words | tojson| safe}}</textarea>
+            <button type="submit" class="btn btn-outline-danger" name="generate">Generate / Regenerate</button>
+            <button type="submit" class="btn btn-success" name="save">Save Changes</button>
+        </div>              
+    </form>
+  </div>
+</div>
+{% endblock %}

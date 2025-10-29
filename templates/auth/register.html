@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mt-5" style="max-width: 400px;">
+  <h3 class="text-center mb-4">Create a New Account</h3>
+
+  <form method="POST" id="registerForm">
+    <div class="mb-3">
+      <label for="username" class="form-label">Username</label>
+      <input type="text" class="form-control" id="username" name="username" placeholder="e.g. crosswordfan" required>
+    </div>
+
+    <div class="mb-3">
+      <label for="password" class="form-label">Password</label>
+      <input type="password" class="form-control" id="password" name="password" placeholder="At least 6 characters" required>
+      <div class="mt-2">
+        <div class="progress" style="height: 6px;">
+          <div id="strengthBar" class="progress-bar" role="progressbar" style="width: 0%;"></div>
+        </div>
+        <small id="strengthText" class="text-muted">Password strength: -</small>
+      </div>
+    </div>
+
+    <div class="mb-3">
+      <label for="confirm" class="form-label">Confirm Password</label>
+      <input type="password" class="form-control" id="confirm" name="confirm" required>
+    </div>
+
+    <button type="submit" class="btn btn-primary w-100">Sign Up</button>
+
+    <p class="text-center mt-3">
+      Already have an account? <a href="{{ url_for('login') }}" class="btn btn-sm btn-danger">Log In</a>
+    </p>
+  </form>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const password = document.getElementById('password');
+  const bar = document.getElementById('strengthBar');
+  const text = document.getElementById('strengthText');
+
+  password.addEventListener('input', () => {
+    const val = password.value;
+    let strength = 0;
+
+    if (val.length >= 6) strength += 1;
+    if (/[A-Z]/.test(val)) strength += 1;
+    if (/[0-9]/.test(val)) strength += 1;
+    if (/[^A-Za-z0-9]/.test(val)) strength += 1;
+
+    let width = (strength / 4) * 100;
+    let color = 'bg-danger';
+    let msg = 'Very weak 😅';
+
+    if (strength === 2) { color = 'bg-warning'; msg = 'Getting better 💪'; }
+    if (strength === 3) { color = 'bg-info'; msg = 'Pretty strong 🔥'; }
+    if (strength === 4) { color = 'bg-success'; msg = 'Super secure! 🛡️'; }
+
+    bar.className = 'progress-bar ' + color;
+    bar.style.width = width + '%';
+    text.textContent = 'Password strength: ' + msg;
+  });
+});
+</script>
+{% endblock %}

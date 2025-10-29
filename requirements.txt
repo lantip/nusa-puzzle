@@ -1,0 +1,11 @@
+backports.tarfile
+flask-login
+flask-sqlalchemy
+importlib-metadata
+jaraco.collections
+packaging
+pillow
+pip-chill
+platformdirs
+python-slugify
+tomli

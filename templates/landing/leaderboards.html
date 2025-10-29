@@ -1,0 +1,198 @@
+{% extends 'landing/base.html' %}
+
+{% block title %}Leaderboard{% endblock %}
+{% block bodyclass %}{% endblock %}
+{% block navbarhome %}{% endblock %}
+{% block ispage %}<div class="page">{% endblock %}
+
+{% block content %}
+<div class="page-header mt-4 d-print-none">
+  <div class="container-xl">
+    <div class="row g-2 align-items-center">
+      <div class="col">
+        <div class="page-pretitle">🏅 Rangking</div>
+        <h2 class="page-title">Papan Jawara</h2>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="page-body">
+  <div class="container-xl">
+
+    <!-- 🌍 GLOBAL LEADERBOARD -->
+    <div class="row justify-content-center mb-4">
+        <div class="col-12 col-md-8 col-lg-6 col-xl-4">
+            <div class="leaderboard mt-3">
+                <div class="leaderboard-header">                
+                    <h4><span class="leaderboard-icon">👑</span> &nbsp; &nbsp; Jawara Umum</h4>
+                </div>
+                <div class="leaderboard-list">
+                    {% for s in global_leaderboard %}
+                    <div class="leaderboard-item rank-{{ loop.index }}">
+                    <span class="rank">{{ loop.index }}.</span>
+                    <span class="name">
+                        {{ s.player_name }}
+                    </span>
+                    <span class="score">{{ s.best_score }}</span>
+                    </div>
+                    {% else %}
+                    <div class="leaderboard-item empty">No scores yet. Be the first!</div>
+                    {% endfor %}
+                </div>
+            </div>             
+        </div>
+    </div>
+
+    <div class="row row-deck row-cards">
+      {% for crossword, scores in leaderboard_data %}
+      <div class="col-sm-6 col-lg-4">
+        <div class="card shadow-sm">
+          <div class="card-header bg-light">
+            <h4 class="mb-0">Jawara {{ crossword.title }}</h4>
+          </div>
+          <div class="card-body">
+            <div class="aleaderboard-list">
+              {% for s in scores %}
+              <div class="aleaderboard-item rank-{{ loop.index }}">
+                <span class="arank">{{ loop.index }}.</span>
+                <span class="aname">{{ s.player_name }}</span>
+                <span class="ascore">{{ s.best_score }}</span>
+              </div>
+              {% else %}
+              <div class="aleaderboard-item empty">No scores yet. Be the first!</div>
+              {% endfor %}
+            </div>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+
+  </div>
+</div>
+{% endblock %}
+{% block isendpage %}</div>{% endblock %}
+
+{% block styles %}
+<style>
+.leaderboard {
+  width: 100%;
+  border-radius: 12px;
+  overflow: hidden;
+  font-family: 'Inter', sans-serif;
+}
+
+.leaderboard-header {
+  background-color: #2f323a;
+  color: snow;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0.8rem 1rem;
+  font-weight: 600;
+  border-top-left-radius: 12px;
+  border-top-right-radius: 12px;
+}
+.leaderboard-header h4,
+h4.titlehasil {
+  color: snow;
+  display: inline-block;
+  margin-left: 4px;
+  font-size: 20px;
+  text-align: center;
+}
+.leaderboard-icon {
+  font-size: 1.2rem;
+}
+
+.leaderboard-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.leaderboard-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.8rem 1rem;
+  color: #fff;
+  font-weight: 500;
+}
+
+.leaderboard-item .rank {
+  font-weight: 600;
+  margin-right: 0.4rem;
+}
+
+.leaderboard-item .score {
+  font-weight: 600;
+}
+
+.leaderboard-item.empty {
+  text-align: center;
+  color: #ccc;
+  background: #444;
+}
+
+/* Gradient per rank */
+.rank-1 { background: #fa6855; }
+.rank-2 { background: #e0574f; }
+.rank-3 { background: #d7514d; }
+.rank-4 { background: #cd4b4b; }
+.rank-5 { background: #c24448; }
+.leaderboard-item:not(.rank-1):not(.rank-2):not(.rank-3):not(.rank-4):not(.rank-5) {
+  background: #a83232;
+}
+
+/* Rounded bottom */
+.leaderboard-item:last-child {
+  border-bottom-left-radius: 12px;
+  border-bottom-right-radius: 12px;
+}
+
+.aleaderboard-list {
+  display: flex;
+  flex-direction: column;
+  gap: .4rem;
+}
+.aleaderboard-item {
+  display: flex;
+  justify-content: space-between;
+  padding: .4rem .8rem;
+  border-radius: .4rem;
+  background: var(--tblr-bg-surface-secondary);
+}
+.aleaderboard-item.rank-1 {
+  background: gold;
+  font-weight: bold;
+}
+.aleaderboard-item.rank-2 {
+  background: silver;
+  font-weight: bold;
+}
+.aleaderboard-item.rank-3 {
+  background: #cd7f32;
+  font-weight: bold;
+}
+.aleaderboard-item.empty {
+  color: var(--tblr-muted);
+  font-style: italic;
+  text-align: center;
+}
+.arank {
+  width: 2rem;
+  text-align: right;
+}
+.aname {
+  flex: 1;
+  padding: 0 .5rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.ascore {
+  font-weight: 600;
+}
+</style>
+{% endblock %}

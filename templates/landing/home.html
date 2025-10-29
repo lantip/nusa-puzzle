@@ -1,0 +1,314 @@
+{% extends 'landing/base.html' %}
+
+{% block headertwo %}
+    <header class="hero">
+        <div class="container">
+            <div class="row g-8 align-items-center">
+                <div class="col-md-6 text-center text-md-start">
+                    <div class="hero-subheader">NUSA PUZZLE</div>
+                    <h1 class="hero-title">
+                        TTS Aksara Nusantara<br />
+                        <span class="text-primary" id="typed">Jawa</span>
+                    </h1>
+                    <p class="hero-description mt-4">Tempat untuk belajar dan bermain Aksara Nusantara. Anda bisa membuat sendiri Teka-teki silang dengan aksara apa saja di sini.</p>
+                    <div class="mt-6 mt-lg-7">
+                        <div class="row justify-content-center justify-content-md-start">
+                            <div class="col-auto"><a href="/login" class="btn btn-lg btn-primary">Membuat</a></div>
+                            <div class="col-auto"><a href="/list-games" class="btn btn-lg">Bermain</a></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="hero-img-side">
+                        <div id="carousel-controls" class="carousel slide" data-bs-ride="carousel" data-interval="4000">
+                            <div class="carousel-inner">
+                                <div class="carousel-item active">
+                                    <img src="{{ url_for('static', filename='img/tts-01.png')}}" />
+                                </div>
+                                <div class="carousel-item">
+                                    <img src="{{ url_for('static', filename='img/tts-02.png')}}" />
+                                </div>                                
+                            </div>
+                            <a class="carousel-control-prev text-secondary" href="#carousel-controls" role="button" data-bs-slide="prev">
+                                <!-- Download SVG icon from http://tabler.io/icons/icon/chevron-left -->
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-md">
+                                    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                                    <path d="M15 6l-6 6l6 6" /></svg>
+                                <span class="visually-hidden">Previous</span>
+                            </a>
+                            <a class="carousel-control-next text-secondary" href="#carousel-controls" role="button" data-bs-slide="next">
+                                <!-- Download SVG icon from http://tabler.io/icons/icon/chevron-right -->
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-md">
+                                    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                                    <path d="M9 6l6 6l-6 6" /></svg>
+                                <span class="visually-hidden">Next</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+{% endblock %}
+
+{% block content %}
+    <section class="section section-light mt-4 pt-4">
+        <svg class="section-divider" xmlns="http://www.w3.org/2000/svg" viewBox="0 24 150 28" preserveAspectRatio="none">
+            <path class="wave-1" d="M-110 44c30 0 58-18 88-18s 58 18 88 18 58-18 88-18 58 18 88 18 v44h-352z"></path>
+            <path class="wave-2" d="M-110 44c30 0 58-18 88-18s 58 18 88 18 58-18 88-18 58 18 88 18 v44h-352z"></path>
+            <path class="wave-3" d="M-110 44c30 0 58-18 88-18s 58 18 88 18 58-18 88-18 58 18 88 18 v44h-352z"></path>
+        </svg>
+        <div class="container">
+            <div class="section-header mb-6">
+                <h2 class="section-title text-muted">Mendukung seluruh aksara di Nusantara</h2>
+            </div>
+            
+            <div class="slider-container">
+                <div class="swiper-container image-slider">
+                    <div class="swiper-wrapper">
+                        {% for font in fonts %}
+                        <div class="swiper-slide">
+                                <div class="thumbnail font-list">
+                                    <img src="https://aksaradinusantara.com/assets/img/thumbnail/{{font}}.png">
+                                    <strong>{{font|title}}</strong>
+                                </div>
+                        </div>
+                        {% endfor %}
+                    </div> 
+                </div> 
+            </div> 
+        </div>
+    </section>
+    <section class="section">
+        <div class="container">
+            <div class="row items-center text-center g-lg-10">
+                <div class="col-md-6 col-lg">
+                    <div class="shape shape-md mb-3">
+                        <!-- Download SVG icon from http://tabler.io/icons/icon/devices -->
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon">
+                            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                            <path d="M13 9a1 1 0 0 1 1 -1h6a1 1 0 0 1 1 1v10a1 1 0 0 1 -1 1h-6a1 1 0 0 1 -1 -1v-10z" />
+                            <path d="M18 8v-3a1 1 0 0 0 -1 -1h-13a1 1 0 0 0 -1 1v12a1 1 0 0 0 1 1h9" />
+                            <path d="M16 9h2" /></svg>
+                    </div>
+                    <h2 class="h2">Responsif</h2>
+                    <p class="text-muted">Situs ini bekerja dengan tampilan desktop maupun mobile.</p>
+                </div>
+                <div class="col-md-6 col-lg">
+                    <div class="shape shape-md mb-3">
+                        <!-- Download SVG icon from http://tabler.io/icons/icon/mailbox -->
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon">
+                            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                            <path d="M10 21v-6.5a3.5 3.5 0 0 0 -7 0v6.5h18v-6a4 4 0 0 0 -4 -4h-10.5" />
+                            <path d="M12 11v-8h4l2 2l-2 2h-4" />
+                            <path d="M6 15h1" /></svg>
+                    </div>
+                    <h2 class="h2">Mendukung Semua Aksara</h2>
+                    <p class="text-muted">Anda bisa membuat teka-teki silang dengan aksara Nusantara apa saja.</p>
+                </div>
+                <div class="col-md-6 col-lg">
+                    <div class="shape shape-md mb-3">
+                        <!-- Download SVG icon from http://tabler.io/icons/icon/palette -->
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon">
+                            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                            <path d="M12 21a9 9 0 0 1 0 -18c4.97 0 9 3.582 9 8c0 1.06 -.474 2.078 -1.318 2.828c-.844 .75 -1.989 1.172 -3.182 1.172h-2.5a2 2 0 0 0 -1 3.75a1.3 1.3 0 0 1 -1 2.25" />
+                            <path d="M8.5 10.5m-1 0a1 1 0 1 0 2 0a1 1 0 1 0 -2 0" />
+                            <path d="M12.5 7.5m-1 0a1 1 0 1 0 2 0a1 1 0 1 0 -2 0" />
+                            <path d="M16.5 10.5m-1 0a1 1 0 1 0 2 0a1 1 0 1 0 -2 0" /></svg>
+                    </div>
+                    <h2 class="h2">Gamifikasi</h2>
+                    <p class="text-muted">Dengan fitur papan peringkat, pengguna bisa menunjukkan kemampuan otak dan beraksara mereka.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+    <section class="section section-light">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Kode Sumber Terbuka</h2>
+                <div class="section-description">Anda bisa menjalankan aplikasi ini baik di lokal maupun di server Anda sendiri. Anda bahkan bisa mengembangkan lebih jauh.</div>
+            </div>
+            <div class="row g-10">
+                <div class="col-lg-6 mb-3 mb-lg-0">
+                    <img src="{{ url_for('static', filename='img/code.png') }}" alt="source code" />
+                </div>
+                <div class="col-lg-6">
+                    <div class="space-y-6">
+                        <div>
+                            <div class="row">
+                                <div class="col-auto">
+                                    <div class="shape shape-md">
+                                        <!-- Download SVG icon from http://tabler.io/icons/icon/tools -->
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon">
+                                            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                                            <path d="M3 21h4l13 -13a1.5 1.5 0 0 0 -4 -4l-13 13v4" />
+                                            <path d="M14.5 5.5l4 4" />
+                                            <path d="M12 8l-5 -5l-4 4l5 5" />
+                                            <path d="M7 8l-1.5 1.5" />
+                                            <path d="M16 12l5 5l-4 4l-5 -5" />
+                                            <path d="M16 17l-1.5 1.5" /></svg>
+                                    </div>
+                                </div>
+                                <div class="col">
+                                    <h3 class="h2 mb-2">Bahasa Pemrograman Python</h3>
+                                    <p class="text-muted m-0">
+                                        Aplikasi ini dibangun dengan bahasa pemrograman python. Maka untuk menjalankan aplikasi ini di lokal maupun di server Anda, Anda harus memastikan bahwa server atau komputer Anda mendukung dan terinstall python3+
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="row">
+                                <div class="col-auto">
+                                    <div class="shape shape-md">
+                                        <!-- Download SVG icon from http://tabler.io/icons/icon/brand-bootstrap -->
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon">
+                                            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                                            <path d="M2 12a2 2 0 0 0 2 -2v-4a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4a2 2 0 0 0 2 2" />
+                                            <path d="M2 12a2 2 0 0 1 2 2v4a2 2 0 0 0 2 2h12a2 2 0 0 0 2 -2v-4a2 2 0 0 1 2 -2" />
+                                            <path d="M9 16v-8h3.5a2 2 0 1 1 0 4h-3.5h4a2 2 0 1 1 0 4h-4z" /></svg>
+                                    </div>
+                                </div>
+                                <div class="col">
+                                    <h3 class="h2 mb-2">Dari developer untuk developer</h3>
+                                    <p class="text-muted m-0">
+                                        Kode sumber aplikasi ini dibangun dengan sebisa mungkin menghindari ketergantungan terhadap library (pustaka) tertentu. 
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="row">
+                                <div class="col-auto">
+                                    <div class="shape shape-md">
+                                        <!-- Download SVG icon from http://tabler.io/icons/icon/paint -->
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon">
+                                            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                                            <path d="M5 3m0 2a2 2 0 0 1 2 -2h10a2 2 0 0 1 2 2v2a2 2 0 0 1 -2 2h-10a2 2 0 0 1 -2 -2z" />
+                                            <path d="M19 6h1a2 2 0 0 1 2 2a5 5 0 0 1 -5 5l-5 0v2" />
+                                            <path d="M10 15m0 1a1 1 0 0 1 1 -1h2a1 1 0 0 1 1 1v4a1 1 0 0 1 -1 1h-2a1 1 0 0 1 -1 -1z" /></svg>
+                                    </div>
+                                </div>
+                                <div class="col">
+                                    <h3 class="h2 mb-2">Sesuai selera Anda.</h3>
+                                    <p class="text-muted m-0">Dengan kode sumber yang tidak tergantung pada library tertentu, kecuali tabler untuk css, Anda bisa mengkostumasi aplikasi ini sebebas mungkin.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <section class="section">
+        <div class="container">
+            <div class="row g-xl-6">
+                <div class="col-lg-4">
+                    <div class="section-header text-start sticky-top">
+                        <div class="section-title">Yang Banyak Ditanyakan</div>
+                        <p class="section-description">Ada pertanyaan lain? Silakan sampaikan di laman github.</p>
+                    </div>
+                </div>
+                <div class="col-lg">
+                    <div class="space-y-5">
+                        <div>
+                            <div class="h3 mb-1">Library apa yang dipakai di aplikasi ini?</div>
+                            <div class="text-muted">Tidak ada. Semuanya vanila, kecuali untuk library css, menggunakan Tabler.</div>
+                        </div>
+                        <div>
+                            <div class="h3 mb-1">Apakah saya bisa menggunakan ini untuk anak didik saya?</div>
+                            <div class="text-muted">Boleh sekali! Saya justru berterimakasih jika Anda berkenan menggunakan aplikasi ini.</div>
+                        </div>
+                        <div>
+                            <div class="h3 mb-1">Apakah saya bisa menjual produk modifikasi dari kode sumber aplikasi ini?</div>
+                            <div class="text-muted">
+                                Mangga, silakan. Saya tidak akan meminta imbalan apapun. Tapi kalau Anda dapat rejeki dari modifikasi aplikasi ini, mohon jangan lupa sisihkan sedikit untuk saudara kita yang kekurangan.
+                            </div>
+                        </div>
+                        <div>
+                            <div class="h3 mb-1">Apakah anda mengerjakan ini sendirian?</div>
+                            <div class="text-muted">
+                                Tentu saja tidak. Untuk kode sumber, saya mengambil dan memodifikasi dari banyak kode lain yang berlisensi MIT. Untuk tampilan muka, saya dibantu oleh mas cunkmusk dan jauhari. Untuk ilustrasinya, saya mengambil dari vecteezy.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}
+
+
+{% block libscript %}
+    <script src="{{ url_for('static', filename='js/swiper.min.js') }}"></script> 
+    <script src="{{ url_for('static', filename='libs/typed.js/dist/typed.umd.js') }}" defer></script>
+{% endblock %}
+
+{% block endscript %}
+    <script>
+    document.addEventListener("DOMContentLoaded", function() {
+        var typed = new Typed('#typed', {
+            strings: ['Jawa', 'Sunda', 'Bali', 'Kawi', 'Pegon', 'Rejang', 'Lontara'],
+            typeSpeed: 100,
+            backSpeed: 50,
+            backDelay: 1000,
+            startDelay: 1000,
+            loop: true,
+            fade: true
+        });
+    });
+    var imageSlider = new Swiper('.image-slider', {
+        autoplay: {
+            delay: 2000,
+            disableOnInteraction: false
+		},
+        loop: true,
+        spaceBetween: 30,
+        slidesPerView: 5,
+		breakpoints: {
+            // when window is <= 580px
+            580: {
+                slidesPerView: 1,
+                spaceBetween: 10
+            },
+            // when window is <= 768px
+            768: {
+                slidesPerView: 2,
+                spaceBetween: 20
+            },
+            // when window is <= 992px
+            992: {
+                slidesPerView: 3,
+                spaceBetween: 20
+            },
+            // when window is <= 1200px
+            1200: {
+                slidesPerView: 4,
+                spaceBetween: 20
+            },
+
+        }
+    });
+
+
+    /* Text Slider - Swiper */
+	var textSlider = new Swiper('.text-slider', {
+        autoplay: {
+            delay: 6000,
+            disableOnInteraction: false
+		},
+        loop: true,
+        navigation: {
+			nextEl: '.swiper-button-next',
+			prevEl: '.swiper-button-prev'
+		}
+    });
+    </script>
+    <style>
+        .thumbnail.font-list {
+            text-align: center;
+            color: gray
+        }
+    </style>
+{% endblock %}

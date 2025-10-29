@@ -1,0 +1,212 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mt-4">
+  <h2>🧩 New Crossword</h2>
+
+  <div class="mb-3">
+    <label class="form-label">Title</label>
+    <input type="text" id="title" class="form-control" placeholder="Crossword title">
+  </div>
+  <div class="mb-3">
+    <label class="form-label">Aksara</label>
+    <select id="fontPicker" class="form-select">
+        <option value="">Default (Sans-serif)</option>
+    </select>
+  </div>
+  <h5>Word List</h5>
+  <table class="table" id="wordTable">
+    <thead>
+      <tr><th>Word</th><th>Clue</th><th></th></tr>
+    </thead>
+    <tbody id="wordRows">
+      <tr>
+        <td><input type="text" class="form-control word" placeholder="word"></td>
+        <td><input type="text" class="form-control clue" placeholder="hint"></td>
+        <td><button type="button" class="btn btn-danger btn-sm" onclick="removeRow(this)">✖</button></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <button type="button" class="btn btn-secondary mb-3" onclick="addRow()">➕ Add Word</button>
+  <button type="button" class="btn btn-outline-primary mb-3" onclick="generatePreview()">🔄 Generate Preview</button>
+
+  <div id="previewSection" style="display:none;">
+    <hr>
+    <h4>🧠 Crossword Preview</h4>
+    <div id="crosswordContainer"></div>
+
+    <div class="mt-3">
+      <button type="button" class="btn btn-success" onclick="saveCrossword()">💾 Save Crossword</button>
+    </div>
+  </div>
+</div>
+
+<script>
+let selectedFontName = null; 
+
+function addRow() {
+  const row = `
+    <tr>
+      <td><input type="text" class="form-control word" placeholder="word"></td>
+      <td><input type="text" class="form-control clue" placeholder="hint"></td>
+      <td><button type="button" class="btn btn-danger btn-sm" onclick="removeRow(this)">✖</button></td>
+    </tr>`;
+  document.getElementById('wordRows').insertAdjacentHTML('beforeend', row);
+}
+
+function removeRow(btn) {
+  btn.closest('tr').remove();
+}
+
+async function generatePreview() {
+  const title = document.getElementById('title').value.trim();
+  const rows = document.querySelectorAll('#wordRows tr');
+  const words = [];
+  rows.forEach(row => {
+    const word = row.querySelector('.word').value.trim();
+    const clue = row.querySelector('.clue').value.trim();
+    if (word && clue) words.push({word, clue});
+  });
+
+  const res = await fetch('{{ url_for("generate_preview") }}', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({title, words})
+  });
+
+  const data = await res.json();
+
+  if (data.error) {
+    alert(data.error);
+    return;
+  }
+
+  renderGrid(data.grid);
+  document.getElementById('previewSection').style.display = 'block';
+  window.generatedCrossword = data; // store for saving
+}
+
+function renderGrid(grid) {
+  let html = `
+    <div style="display:inline-block;border:2px solid #333;">
+      <table style="border-collapse:collapse;">
+  `;
+  for (const row of grid) {
+    html += '<tr>';
+    for (const cell of row) {
+      if (cell === ' ') {
+        html += `<td style="width:28px;height:28px;background:#999;border:1px solid #777;"></td>`;
+      } else {
+        html += `<td style="width:28px;height:28px;border:1px solid #777;">${cell}</td>`;
+      }
+    }
+    html += '</tr>';
+  }
+  html += '</table></div>';
+
+  const container = document.getElementById('crosswordContainer');
+  container.innerHTML = html;
+
+  if (selectedFontName) {
+    container.style.setProperty('--crossword-font', selectedFontName);
+  }
+}
+
+async function saveCrossword() {
+  const title = document.getElementById('title').value.trim();
+  const fontFile = document.getElementById('fontPicker').value || null;
+
+  if (!window.generatedCrossword || !title) {
+    alert('Please generate and add a title first!');
+    return;
+  }
+
+  const res = await fetch('{{ url_for("save_crossword") }}', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({
+      title,
+      grid: window.generatedCrossword.grid,
+      words: window.generatedCrossword.words,
+      font_file: fontFile
+    })
+  });
+
+  const data = await res.json();
+  if (data.success) {
+    alert('✅ Crossword saved!');
+    window.location.href = data.redirect;
+  } else {
+    alert('❌ Error saving crossword');
+  }
+}
+
+document.addEventListener('DOMContentLoaded', loadFontList);
+
+function toTitleCase(str) {
+  if (!str) { 
+    return "";
+  }
+  return str
+    .toLowerCase() 
+    .split(' ') 
+    .map(word => { 
+      if (word.length === 0) { 
+        return "";
+      }
+      return word.charAt(0).toUpperCase() + word.slice(1);
+    })
+    .join(' '); 
+}
+
+async function loadFontList() {
+  const res = await fetch('/api/fonts');
+  const fonts = await res.json();
+  const picker = document.getElementById('fontPicker');
+
+  for (const f of fonts) {
+    const option = document.createElement('option');
+    option.value = f.file;
+    option.textContent = toTitleCase(f.label);
+    option.style.fontFamily = `'${f.fontname}', sans-serif`;
+    picker.appendChild(option);
+  }
+
+  picker.addEventListener('change', () => {
+    const selectedFile = picker.value;
+    if (selectedFile) previewFont(selectedFile);
+    else document.body.style.removeProperty('--crossword-font');
+  });
+}
+
+async function previewFont(fontFile) {
+  const fontName = fontFile.replace(/\.[^/.]+$/, '').split('__').pop();
+  const fontUrl = `/static/font/${encodeURIComponent(fontFile)}`;
+  try {
+    const font = new FontFace(fontName, `url(${fontUrl})`);
+    await font.load();
+    document.fonts.add(font);
+
+    selectedFontName = fontName; 
+
+    document.getElementById('crosswordContainer').style.setProperty('--crossword-font', fontName);
+    console.log(`✅ Loaded font: ${fontName}`);
+  } catch (e) {
+    console.warn('Could not load font:', fontFile, e);
+  }
+}
+
+</script>
+<style>
+  :root {
+    --crossword-font: sans-serif;
+  }
+
+  #crosswordContainer td {
+    font-family: var(--crossword-font, sans-serif);
+    font-weight: bold;
+    text-transform: uppercase;
+    text-align: center;
+  }
+</style>
+{% endblock %}

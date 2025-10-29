@@ -1,0 +1,37 @@
+{% extends 'landing/base.html' %}
+{% block title %}Kebijakan Privasi{% endblock %}
+{% block bodyclass %}{% endblock %}
+{% block navbarhome %}{% endblock %}
+{% block ispage %}<div class="page">{% endblock %}
+{% block content %}
+
+<div class="page-header mt-4 d-print-none"> <div class="container-xl"> <div class="row g-2 align-items-center"> <div class="col"> <div class="page-pretitle">Informasi</div> <h2 class="page-title">Kebijakan Privasi</h2> </div> </div> </div> </div> <div class="page-body"> <div class="container-xl"> <div class="card"> <div class="card-body"> <h3 class="mb-3">1. Pengumpulan Data</h3> <p>Platform ini hanya mengumpulkan data yang diperlukan untuk menjalankan fitur utama, seperti nama pengguna, skor permainan, dan tanggal aktivitas. Data tersebut digunakan untuk menampilkan papan peringkat serta statistik permainan.</p>
+    <h3 class="mt-4 mb-3">2. Data Pengguna Tamu</h3>
+    <p>Jika Anda bermain tanpa akun (sebagai tamu), kami menyimpan nama yang Anda masukkan dan skor yang dihasilkan untuk keperluan pencatatan skor. Tidak ada data pribadi lain yang dikumpulkan.</p>
+
+    <h3 class="mt-4 mb-3">3. Cookie dan Analitik</h3>
+    <p>Platform ini tidak menggunakan pelacak komersial atau cookie pihak ketiga. Jika fitur analitik ditambahkan di masa depan, hal tersebut hanya untuk meningkatkan kualitas pembelajaran dan pengalaman pengguna.</p>
+
+    <h3 class="mt-4 mb-3">4. Keterbukaan Data</h3>
+    <p>Data skor dan nama pengguna dapat ditampilkan secara publik dalam papan peringkat, namun tidak akan digunakan untuk kepentingan lain di luar platform ini.</p>
+
+    <h3 class="mt-4 mb-3">5. Keamanan Data</h3>
+    <p>Kami berupaya menjaga keamanan data Anda dengan penyimpanan yang aman dan praktik terbaik pengelolaan server. Meski begitu, kami tidak dapat menjamin keamanan penuh terhadap segala risiko teknis.</p>
+
+    <h3 class="mt-4 mb-3">6. Perubahan Kebijakan</h3>
+    <p>Kebijakan privasi ini dapat diperbarui sewaktu-waktu untuk menyesuaikan dengan perubahan sistem atau kebutuhan komunitas. Versi terbaru akan selalu tersedia di halaman ini.</p>
+
+    <h3 class="mt-4 mb-3">7. Semangat Gotong Royong</h3>
+    <p>Kami percaya bahwa ilmu dan teknologi adalah alat untuk berbagi. Jika Anda mendapatkan manfaat ekonomi dari penggunaan platform ini, mohon untuk <strong>berbagi rezeki dengan mereka yang membutuhkan</strong>.</p>
+  </div>
+</div>
+
+</div> </div>
+
+{% endblock %}
+{% block isendpage %}</div>{% endblock %}
+{% block style %}
+
+<style> .page-body .card { border-radius: 1rem; box-shadow: 0 4px 16px rgba(0,0,0,0.05); } .page-body h3 { color: var(--tblr-primary); } </style>
+
+{% endblock %}

@@ -1,0 +1,207 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="198.12395mm"
+   height="60.784626mm"
+   viewBox="0 0 198.12395 60.784622"
+   version="1.1"
+   id="svg1"
+   sodipodi:docname="logo.svg"
+   inkscape:version="1.3.2 (091e20e, 2023-11-25)"
+   inkscape:export-filename="favicon.png"
+   inkscape:export-xdpi="400"
+   inkscape:export-ydpi="400"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview1"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:document-units="mm"
+     inkscape:zoom="0.83159426"
+     inkscape:cx="369.77167"
+     inkscape:cy="82.371901"
+     inkscape:window-width="1728"
+     inkscape:window-height="976"
+     inkscape:window-x="0"
+     inkscape:window-y="34"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="layer1"
+     showgrid="false" />
+  <defs
+     id="defs1">
+    <pattern
+       inkscape:collect="always"
+       xlink:href="#Strips1_1"
+       preserveAspectRatio="xMidYMid"
+       id="pattern64"
+       patternTransform="matrix(1.4142136,-1.4142136,1.4142136,1.4142136,0,0)"
+       x="0"
+       y="0" />
+    <pattern
+       inkscape:collect="always"
+       xlink:href="#Strips1_1"
+       preserveAspectRatio="xMidYMid"
+       id="pattern63"
+       patternTransform="matrix(1.4142136,-1.4142136,1.4142136,1.4142136,0,0)"
+       x="0"
+       y="0" />
+    <pattern
+       inkscape:collect="always"
+       xlink:href="#Strips1_1"
+       preserveAspectRatio="xMidYMid"
+       id="pattern62"
+       patternTransform="matrix(1.4142136,-1.4142136,1.4142136,1.4142136,0,0)"
+       x="0"
+       y="0" />
+    <pattern
+       inkscape:collect="always"
+       patternUnits="userSpaceOnUse"
+       width="2"
+       height="10"
+       patternTransform="translate(0,0) scale(2,2)"
+       preserveAspectRatio="xMidYMid"
+       id="Strips1_1"
+       style="fill:#c0c0c0"
+       inkscape:stockid="Stripes 01 (1:1)"
+       inkscape:isstock="true"
+       inkscape:label="Stripes 01 (1:1)">
+      <rect
+   style="stroke:none"
+   x="0"
+   y="-0.5"
+   width="1"
+   height="11"
+   id="rect134" />
+
+    </pattern>
+  </defs>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(-214.34738,-249.5762)">
+    <rect
+       style="fill:#000000;stroke:none;stroke-width:3.6324;stroke-dasharray:none"
+       id="rect53"
+       width="125.43736"
+       height="26.653736"
+       x="287.03397"
+       y="283.70709"
+       ry="1.9180975" />
+    <text
+       xml:space="preserve"
+       style="font-size:4.23333px;line-height:1.25;font-family:Roboto;-inkscape-font-specification:Roboto;stroke-width:0.264583"
+       x="405.75186"
+       y="360.72723"
+       id="text15"><tspan
+         sodipodi:role="line"
+         id="tspan15"
+         style="stroke-width:0.264583"
+         x="405.75186"
+         y="360.72723"></tspan></text>
+    <rect
+       style="fill:#000000;stroke:#1a1a1a;stroke-width:2.465"
+       id="rect19"
+       width="16.078793"
+       height="16.078793"
+       x="215.57988"
+       y="271.10492"
+       ry="2.5548806" />
+    <rect
+       style="fill:url(#pattern63);fill-opacity:1;stroke:#e6e6e6;stroke-width:2.465"
+       id="rect45"
+       width="16.078793"
+       height="16.078793"
+       x="236.19107"
+       y="271.10492"
+       ry="2.5548806" />
+    <rect
+       style="fill:#000000;stroke:#1a1a1a;stroke-width:2.465"
+       id="rect46"
+       width="16.078793"
+       height="16.078793"
+       x="256.99036"
+       y="271.10492"
+       ry="2.5548806" />
+    <rect
+       style="fill:#000000;stroke:#1a1a1a;stroke-width:2.465"
+       id="rect47"
+       width="16.078793"
+       height="16.078793"
+       x="215.57988"
+       y="291.0795"
+       ry="2.5548806" />
+    <rect
+       style="fill:url(#pattern64);fill-opacity:1;stroke:#ececec;stroke-width:2.465"
+       id="rect48"
+       width="16.078793"
+       height="16.078793"
+       x="236.19107"
+       y="291.0795"
+       ry="2.5548806" />
+    <rect
+       style="fill:#000000;stroke:#1a1a1a;stroke-width:2.465"
+       id="rect49"
+       width="16.078793"
+       height="16.078793"
+       x="256.99036"
+       y="291.0795"
+       ry="2.5548806" />
+    <rect
+       style="fill:url(#pattern62);fill-opacity:1;stroke:#ececec;stroke-width:2.465"
+       id="rect50"
+       width="16.078793"
+       height="16.078793"
+       x="215.97018"
+       y="250.8087"
+       ry="2.5548806" />
+    <rect
+       style="fill:#000000;stroke:#1a1a1a;stroke-width:2.465"
+       id="rect51"
+       width="16.078793"
+       height="16.078793"
+       x="236.58138"
+       y="250.8087"
+       ry="2.5548806" />
+    <rect
+       style="fill:#000000;stroke:#1a1a1a;stroke-width:2.465"
+       id="rect52"
+       width="16.078793"
+       height="16.078793"
+       x="257.38068"
+       y="250.8087"
+       ry="2.5548806" />
+    <text
+       xml:space="preserve"
+       style="font-size:55.4902px;line-height:1.25;font-family:Roboto;-inkscape-font-specification:Roboto;stroke-width:0.179386"
+       x="283.95953"
+       y="280.08661"
+       id="text52"><tspan
+         sodipodi:role="line"
+         id="tspan52"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:55.4902px;font-family:'Arial Rounded MT Bold';-inkscape-font-specification:'Arial Rounded MT Bold, ';stroke-width:0.179386"
+         x="283.95953"
+         y="280.08661">nusa</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:28.2222px;line-height:1.85;font-family:Roboto;-inkscape-font-specification:Roboto;letter-spacing:4.92654px;fill:#f9f9f9;stroke-width:0.100431"
+       x="292.86368"
+       y="304.34445"
+       id="text53"><tspan
+         sodipodi:role="line"
+         id="tspan53"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:28.2222px;font-family:'Arial Rounded MT Bold';-inkscape-font-specification:'Arial Rounded MT Bold, ';letter-spacing:4.92654px;fill:#f9f9f9;stroke-width:0.100431"
+         x="292.86368"
+         y="304.34445">puzzle</tspan></text>
+  </g>
+</svg>

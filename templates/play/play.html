@@ -1,0 +1,1021 @@
+{% extends 'landing/base.html' %}
+{% block title %}
+Teka-teki Silang
+{% endblock %}
+{% block ispage %}<div clzss="page">{% endblock %}
+{% block navbarhome %}{% endblock %}
+{% block content %}
+<div class="container mt-4">
+    <div class="alertHolder"></div>
+    <div class="row g-2">
+      <div class="col-md-12 col-lg-8" id="progressScore">
+        <div class="crosswordholder">
+          <table class="crossword">
+            {% for row in grid %}
+                {% set r = loop.index0 %}
+            <tr>
+                {% for cell in row %}                
+                {% set c = loop.index0 %}
+                {% if cell == ' ' %}
+                    <td class="cell-empty"></td>
+                {% else %}
+                    <td class="cell" data-row="{{ r }}" data-col="{{ c }}">
+                    {% if numbers[r][c] %}
+                        <div class="cluenumber">
+                        {{ numbers[r][c] }}
+                        </div>
+                    {% endif %}
+                    <div class="letter"></div>
+                    </td>
+                {% endif %}
+                {% endfor %}
+            </tr>
+            {% endfor %}
+            </table>
+        </div>
+      </div>
+      <div class="col-md-12 col-lg-4">
+        <div class="mb-3 border-bottom">
+            <h1 class="mb-0">{{ crossword.title }}</h1>
+            <p><small>oleh: {{ crossword.author_username }}</small></p>
+        </div>
+        <div id="clueplayground">
+            <div class="accordion mb-3" id="clues-accross">
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="heading-mendatar">
+                        <button class="accordion-button bg-dark text-dark-fg rounded-top-3 collapsed py-2" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-mendatar">
+                            Mendatar
+                        </button>
+                    </h2>
+                    <div id="collapse-mendatar" class="accordion-collapse collapse" data-bs-parent="#clues-accross">
+                        <div class="list-group list-group-flush">
+                            {% for clue in clues.across %}
+                            <a class="list-group-item list-group-item-action clue py-3" data-dir="across" value="{{ clue.number }}" data-num="{{ clue.number }}"><span class="badge bg-dark text-dark-fg">{{ clue.number }}</span> {{ clue.clue|title }}</a>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="accordion mb-3" id="clues-down">
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="heading-menurun">
+                        <button class="accordion-button bg-dark text-dark-fg rounded-top-3 collapsed py-2" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-menurun">
+                            Menurun
+                        </button>
+                    </h2>
+                    <div id="collapse-menurun" class="accordion-collapse collapse" data-bs-parent="#clues-down">
+                        <div class="list-group list-group-flush">
+                            {% for clue in clues.down %}
+                            <a class="list-group-item list-group-item-action clue py-3" data-dir="down" value="{{ clue.number }}" data-num="{{ clue.number }}"><span class="badge bg-dark text-dark-fg">{{ clue.number }}</span> {{ clue.clue|title }}</a>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="mt-5">
+                <div class="alert alert-danger alert-dismissible alertscore d-none mb-3" role="alert">
+                    <div class="d-flex">
+                        <div>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon alert-icon icon-2">
+                                <path d="M3 12a9 9 0 1 0 18 0a9 9 0 0 0 -18 0" />
+                                <path d="M12 8v4" />
+                                <path d="M12 16h.01" />
+                            </svg>
+                        </div>
+                        <div>
+                            <div class="alert-heading">Error!</div>
+                            <div class="alert-description">This is a danger alert</div>
+                        </div>
+                    </div>
+                    <a class="btn-close" data-bs-dismiss="alert" aria-label="close"></a>
+                </div>
+                <form method="POST">
+                    {% if not current_user.is_authenticated %}
+                    <div class="mb-3">
+                        <label>Your Name</label>
+                        <div class="alert alert-danger alert-dismissible alert_user d-none" role="alert">
+                            <div class="alert-icon">
+                                <!-- Download SVG icon from http://tabler.io/icons/icon/alert-circle -->
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon alert-icon icon-2">
+                                <path d="M3 12a9 9 0 1 0 18 0a9 9 0 0 0 -18 0"></path>
+                                <path d="M12 8v4"></path>
+                                <path d="M12 16h.01"></path>
+                                </svg>
+                            </div>
+                            <span class="text_alert"></span>
+                            <a class="btn-close close_alert" data-bs-dismiss="alert" aria-label="close"></a>
+                        </div>
+                        <input type="text" name="guest_name" class="form-control" value="{{ guest_name }}" placeholder="Enter your name" required>
+                    </div>
+                    {% else %}
+                    <p><strong>Bermain sebagai:</strong> {{ current_user.username }}</p>
+                    {% endif %}
+                    <input type="hidden" name="score" value="0">
+
+                    <button type="button" class="btn btn-primary btn-lg rounded-3 form-control" id="submit-answers">Kirim Jawaban</button>
+                </form>
+            </div>
+        </div>        
+        <div class="leaderboard mt-3">
+            <div class="leaderboard-header">                
+                <h4><span class="leaderboard-icon">👑</span> &nbsp; &nbsp; Papan Peringkat</h4>
+            </div>
+            <div class="leaderboard-list">
+                {% for s in scores %}
+                <div class="leaderboard-item rank-{{ loop.index }}">
+                <span class="rank">{{ loop.index }}.</span>
+                <span class="name">
+                    {% if s.user %}
+                    {{ s.user.username }}
+                    {% else %}
+                    {{ s.guest_name }}
+                    {% endif %}
+                </span>
+                <span class="score">{{ s.score }}</span>
+                </div>
+                {% else %}
+                <div class="leaderboard-item empty">No scores yet. Be the first!</div>
+                {% endfor %}
+            </div>
+        </div> 
+      </div>
+    </div>
+</div>
+
+<script>
+function showResultWithAnimation(resultContainer, finalHTML) {
+    const crosswordHolder = document.querySelector('.crosswordholder');
+    const clueHolder = document.getElementById('clueplayground');
+    crosswordHolder.classList.add('fade-out');
+    clueHolder.classList.add('fade-out');
+
+
+    setTimeout(() => {
+    crosswordHolder.innerHTML = '';
+    clueHolder.classList.add('d-none');
+    resultContainer.innerHTML = finalHTML;
+    resultContainer.classList.add('fade-in');
+    }, 600);
+}    
+function createAlert({ type = 'danger', title = 'Error!', description = 'Something went wrong.' }) {
+  const wrapper = document.createElement('div');
+  wrapper.className = `alert alert-${type} alert-dismissible alertumum mb-3`;
+  wrapper.role = 'alert';
+
+  wrapper.innerHTML = `
+    <div class="d-flex">
+      <div>
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" 
+             viewBox="0 0 24 24" fill="none" stroke="currentColor" 
+             stroke-width="2" stroke-linecap="round" stroke-linejoin="round" 
+             class="icon alert-icon icon-2">
+          <path d="M3 12a9 9 0 1 0 18 0a9 9 0 0 0 -18 0" />
+          <path d="M12 8v4" />
+          <path d="M12 16h.01" />
+        </svg>
+      </div>
+      <div>
+        <div class="alert-heading">${title}</div>
+        <div class="alert-description">${description}</div>
+      </div>
+    </div>
+    <a class="btn-close" data-bs-dismiss="alert" aria-label="close"></a>
+  `;
+
+  return wrapper;
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  const alertHolder = document.querySelector('.alertHolder');
+  const crosswordWords = {{ words|tojson | safe }};
+  const wordsByNumber = {};
+  crosswordWords.forEach(w => {
+    if (w.number !== undefined && w.number !== null) {
+      wordsByNumber[String(w.number)] = w;
+    }
+  });
+
+  function findWordByCoords(num, dir) {
+    if (wordsByNumber[String(num)]) {
+      const candidate = wordsByNumber[String(num)];
+      if ((dir === 'across' && !candidate.vertical) || (dir === 'down' && candidate.vertical)) {
+        return candidate;
+      }
+    }
+    return crosswordWords.find(w => {
+      const r = Number(w.row);
+      const c = Number(w.col);
+      const v = !!w.vertical;
+      return w.number === num && ((dir === 'across' && !v) || (dir === 'down' && v));
+    }) || null;
+  }
+
+  function clearHighlights() {
+    document.querySelectorAll('.cell').forEach(c => c.classList.remove('highlight'));
+  }
+
+  function highlightWord(wordData) {
+    clearHighlights();
+    if (!wordData) return [];
+    const row = Number(wordData.row);
+    const col = Number(wordData.col);
+    const vertical = !!wordData.vertical;
+    const length = wordData.word.length;
+    const cells = [];
+    for (let i = 0; i < length; i++) {
+      const r = row + (vertical ? i : 0);
+      const c = col + (vertical ? 0 : i);
+      const cell = document.querySelector(`.cell[data-row="${r}"][data-col="${c}"]`);
+      if (cell) {
+        cell.classList.add('highlight');
+        cells.push(cell);
+      }
+    }
+    return cells;
+  }
+
+  // Inline input creation
+  const inputBox = document.createElement('input');
+  inputBox.type = 'text';
+  inputBox.className = 'inline-input';
+  {% if crossword.font_file %}
+  Object.assign(inputBox.style, {
+    position: 'absolute',
+    zIndex: 10,
+    display: 'none',
+    border: '2px solid #007bff',
+    borderRadius: '4px',
+    textAlign: 'center',
+    fontFamily: '{{ crossword.font_file.split("__")[-1].rsplit(".", 1)[0] }}',
+    outline: 'none',
+  });
+  {% else %}
+
+  Object.assign(inputBox.style, {
+    position: 'absolute',
+    zIndex: 10,
+    display: 'none',
+    border: '2px solid #007bff',
+    borderRadius: '4px',
+    textAlign: 'center',
+    outline: 'none',
+  });
+  {% endif %}
+  document.body.appendChild(inputBox);
+
+  let activeWord = null;
+  let activeCells = [];
+
+  function openInput(wordData, cells) {
+    if (!wordData || !cells.length) return;
+    activeWord = wordData;
+    activeCells = cells;
+
+    const firstCellRect = cells[0].getBoundingClientRect();
+    const lastCellRect = cells[cells.length - 1].getBoundingClientRect();
+    const vertical = !!wordData.vertical;
+
+    const width = vertical
+      ? (lastCellRect.bottom - firstCellRect.top)
+      : (lastCellRect.right - firstCellRect.left);
+    const height = vertical
+      ? firstCellRect.width
+      : firstCellRect.height;
+
+    if (vertical) {
+        inputBox.style.left = ((firstCellRect.left + window.scrollX) - ((firstCellRect.left)/4)) + 'px';
+    } else {
+        inputBox.style.left = firstCellRect.left + window.scrollX + 'px';
+    }    
+    inputBox.style.top = firstCellRect.top + window.scrollY + 'px';
+    inputBox.style.width = width + 'px';
+    inputBox.style.height = height + 'px';
+    inputBox.style.fontSize = '18px';
+    inputBox.maxLength = wordData.word.length;
+    inputBox.value = (wordData.userGuess || '').toUpperCase();
+    inputBox.style.display = 'block';
+    inputBox.focus();
+  }
+
+  function closeInput(commit = true) {
+    if (!activeWord) return;
+    if (commit) {
+      const answer = inputBox.value.trim().toUpperCase();
+      activeWord.userGuess = answer;
+      const row = Number(activeWord.row);
+      const col = Number(activeWord.col);
+      if (answer.length < activeWord.word.length) {
+        alertHolder.innerHTML = '';
+        const alertBox = createAlert({
+            type: 'danger',
+            title: 'Perhatian:',
+            description: 'Jumlah karakter kurang!'
+        });
+        alertHolder.appendChild(alertBox);
+      } else if (answer.length > activeWord.word.length) {
+        alertHolder.innerHTML = '';
+        const alertBox = createAlert({
+            type: 'danger',
+            title: 'Perhatian:',
+            description: 'Jumlah karakter terlalu banyak!'
+        });
+        alertHolder.appendChild(alertBox);
+      } else {
+        const vertical = !!activeWord.vertical;
+        for (let i = 0; i < activeWord.word.length; i++) {
+            const r = row + (vertical ? i : 0);
+            const c = col + (vertical ? 0 : i);
+            const cell = document.querySelector(`.cell[data-row="${r}"][data-col="${c}"]`);
+            if (cell) {
+            const letterDiv = cell.querySelector('.letter');
+            if (letterDiv) letterDiv.textContent = answer[i] || '';
+            }
+        }
+      }
+    }
+    inputBox.style.display = 'none';
+    activeWord = null;
+    activeCells = [];
+  }
+
+  // Clue click
+  document.querySelectorAll('.clue').forEach(clueEl => {
+    clueEl.addEventListener('click', () => {
+      
+      const number = parseInt(clueEl.dataset.num, 10);
+      const dir = clueEl.dataset.dir;
+      const wordData = findWordByCoords(number, dir);
+      if (!wordData) {
+        alertHolder.innerHTML = '';
+        const alertBox = createAlert({
+            type: 'danger',
+            title: 'Perhatian!',
+            description: 'Pertayaan tidak ada dalam daftar!'
+        });
+        alertHolder.appendChild(alertBox);
+        return;
+      }
+      const cells = highlightWord(wordData);
+      document.querySelectorAll('.clue.active').forEach(el => el.classList.remove('active'));
+      clueEl.classList.add('active');
+      openInput(wordData, cells);
+    });
+  });
+
+  inputBox.addEventListener('keydown', e => {
+    if (e.key === 'Enter') closeInput(true);
+    if (e.key === 'Escape') closeInput(false);
+  });
+
+  document.addEventListener('click', e => {
+    if (e.target.classList.contains('inline-input')) return;
+    if (!e.target.closest('.cell') && !e.target.closest('.clue')) {
+      closeInput(true);
+      clearHighlights();
+      document.querySelectorAll('.clue.active').forEach(el => el.classList.remove('active'));
+    }
+  });
+
+  // Scoring
+  document.getElementById('submit-answers').addEventListener('click', async () => {
+    let total = 0, correct = 0;
+
+    {% if not current_user.is_authenticated %}
+    const textAlertHolder = document.querySelector('.text_alert');
+    const alertHolder = document.querySelector('.alert_user');
+    const closeAlert = document.querySelector('.close_alert');
+    closeAlert.addEventListener("click", () => alertHolder.classList.add('d-none'));
+
+    const guestNameInput = document.querySelector('input[name="guest_name"]');
+    if (guestNameInput && guestNameInput.value.trim() === '') {
+        textAlertHolder.textContent = "Please enter your name before submitting!";
+        alertHolder.classList.remove('d-none');
+        guestNameInput.focus();
+        return;
+    }
+    let guest_name = guestNameInput.value.trim();
+    {% else %}
+    let guest_name = "{{current_user.username}}";
+    {% endif %}
+
+    const crosswordEl = document.querySelector('.crosswordholder');
+    const clueHolder = document.getElementById("clueplayground");
+    const resultContainer = document.getElementById('progressScore');
+    const alertScore = document.querySelector('.alertscore');    
+
+
+    if (!alertScore) {
+        location.reload();
+    }
+    // ===== SCORE CALCULATION =====
+    crosswordWords.forEach(w => {
+        if (w.word && w.word.trim() !== '') {
+        const userAnswer = (w.userGuess || '').trim();
+        const correctWord = w.word.toUpperCase();
+        const dir = w.vertical ? 'down' : 'across';
+
+        total += correctWord.length;
+        for (let i = 0; i < correctWord.length; i++) {
+            if ((userAnswer[i] || '').toUpperCase() === correctWord[i]) correct++;
+        }
+        }
+    });
+
+    const score = total ? Math.round((correct / total) * 100) : 0;
+    const grade = score >= 90 ? 'MANTAP JAYA!' :
+                    score >= 75 ? 'KEREN!' :
+                    score >= 50 ? 'LUMAYAN!' : 'SEMANGAT!';
+    const remark = score >= 90 ? 'Sempurna banget! Kamu jago teka-teki silang nih' :
+                    score >= 75 ? 'Keren! Hampir semua jawabannya benar' :
+                    score >= 50 ? 'Lumayan! Masih bisa ditingkatin lagi' :
+                    'Yuk coba lagi, pasti bisa lebih bagus lain kali';
+
+    // ===== BUILD LEFT SCORE CARD =====
+    const leftCard = `
+        <div class="col-md-5">
+        <div class="p-4 bg-white rounded-4 h-100 text-center d-flex flex-column justify-content-center">
+            <h3 class="fw-bold">Hai, {{ current_user.username if current_user.is_authenticated else 'Guest' }}!</h3>
+            <p class="text-muted mb-3">Kamu dapat skor</p>
+            <div class="position-relative d-inline-block mb-3">
+            <svg width="130" height="130">
+                <circle cx="65" cy="65" r="60" stroke="#eee" stroke-width="10" fill="none"></circle>
+                <circle cx="65" cy="65" r="60" stroke="#468bfd" stroke-width="10" fill="none"
+                        stroke-dasharray="377"
+                        stroke-dashoffset="${377 - (377 * score) / 100}"
+                        stroke-linecap="round" transform="rotate(-90 65 65)">
+                </circle>
+                <text x="50%" y="50%" text-anchor="middle" dy=".3em" font-size="38" font-weight="bold">${score}</text>
+            </svg>
+            <div class="mt-2 text-muted small">dari 100</div>
+            </div>
+            <h4 class="fw-bold text-uppercase text-primary">${grade}</h4>
+            <p class="text-muted mb-0">${remark}</p>
+        </div>
+        </div>
+    `;
+
+    // ===== BUILD RIGHT ACCORDION =====
+    const acrossItems = [];
+    const downItems = [];
+
+    crosswordWords.forEach(w => {
+        if (w.word && w.word.trim() !== '') {
+        const userAnswer = (w.userGuess || '').trim();
+        const correctWord = w.word.toUpperCase();
+        const clueNum = w.number || '?';
+        const isCorrect = userAnswer.toUpperCase() === correctWord;
+        const symbol = isCorrect ? '✓' : '✗';
+        const color = isCorrect ? 'text-success' : 'text-danger';
+        const emptyLabel = userAnswer ? userAnswer : '<span class="fst-italic text-muted">(kosong)</span>';
+
+        const itemHTML = `
+            <div class="list-group-item list-group-item-action py-3">
+            <div>
+                <span class="${color} me-2">${symbol}</span>
+                <strong>${clueNum}.</strong> ${w.clue}
+                <div class="small">${emptyLabel}</div>
+                ${!isCorrect ? `<div class="text-muted small fst-italic">${correctWord}</div>` : ''}
+            </div>
+            </div>
+        `;
+
+        if (w.vertical) downItems.push(itemHTML);
+        else acrossItems.push(itemHTML);
+        }
+    });
+
+    const rightCard = `
+        <div class="col-md-7">
+        <div class="accordion" id="accordion-score">
+
+            <!-- Mendatar -->
+            <div class="accordion-item mb-2">
+            <h2 class="accordion-header">
+                <button class="accordion-button bg-dark text-white collapsed py-2" type="button"
+                        data-bs-toggle="collapse" data-bs-target="#collapse-across">
+                Mendatar
+                </button>
+            </h2>
+            <div id="collapse-across" class="accordion-collapse collapse show">
+                <div class="list-group list-group-flush">
+                ${acrossItems.join('')}
+                </div>
+            </div>
+            </div>
+
+            <!-- Menurun -->
+            <div class="accordion-item">
+            <h2 class="accordion-header">
+                <button class="accordion-button bg-success text-white collapsed py-2" type="button"
+                        data-bs-toggle="collapse" data-bs-target="#collapse-down">
+                Menurun
+                </button>
+            </h2>
+            <div id="collapse-down" class="accordion-collapse collapse">
+                <div class="list-group list-group-flush">
+                ${downItems.join('')}
+                </div>
+            </div>
+            </div>
+
+        </div>
+        </div>
+    `;
+
+    // ===== COMBINE BOTH INTO MAIN CARD =====
+    const finalHTML = `
+        <div class="card shadow-sm border-0 rounded-4 overflow-hidden" style="width: 95%">
+        <div class="card-header bg-dark text-white d-flex align-items-center">
+            <i class="ti ti-trophy me-2"></i>
+            <h4 class="mb-0 titlehasil">Hasil dan Jawaban</h4>
+        </div>
+        <div class="card-body bg-light">
+            <div class="row g-4">
+            ${leftCard}
+            ${rightCard}
+            </div>
+        </div>
+        </div>
+    `;    
+
+    // ===== SEND SCORE TO BACKEND =====
+    if (score > 0) {
+        crosswordEl.classList.add('fade-out');
+        clueHolder.classList.add('slide-up');
+        //resultContainer.innerHTML = '';
+        //resultContainer.innerHTML = finalHTML;
+        showResultWithAnimation(resultContainer, finalHTML);
+        const params = { "guest_name": guest_name, "score": score };
+        const res = await fetch(`/api/submit_score/{{ crossword.id }}`, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(params)
+        });
+        const data = await res.json();
+        if (data.success) console.log('✅ Score submitted');
+        clueHolder.classList.add('d-none');
+    } else {
+        
+        alertHolder.innerHTML = '';
+        const alertBox = createAlert({
+            type: 'danger',
+            title: 'Error',
+            description: 'Anda belum menjawab satupun!'
+        });
+        alertHolder.appendChild(alertBox);
+    }
+  });
+});
+</script>
+
+{% if crossword.font_file %}
+<style>
+@font-face {
+  font-family: '{{ crossword.font_file.split("__")[-1].rsplit(".", 1)[0] }}';
+  src: url('{{ url_for("static", filename="font/" + crossword.font_file) }}');
+}
+.cell .letter {
+  font-family: '{{ crossword.font_file.split("__")[-1].rsplit(".", 1)[0] }}', sans-serif;
+}
+</style>
+{% endif %}
+
+
+<style>
+.crosswordholder {
+  display: inline-block;
+}
+table.crossword td,
+table.crossword tr,
+table.crossword tbody {
+  vertical-align: middle;
+  text-align: center;
+}
+
+table.crossword {
+  border-spacing: 0;
+  border-collapse: separate;
+  border-radius: 10px;
+  table-layout: fixed;
+  border: 10px solid #222;
+  width: 95%;
+  aspect-ratio: 1 / 1; 
+}
+
+table.crossword td {
+  width: 30px;
+  height: 30px;
+  border: 1px solid #777;
+  background: #fff;
+  position: relative;
+  padding: 0;
+}
+
+table.crossword td .cluenumber {
+  position: absolute;
+  top: 2px;
+  left: 3px;
+  font-size: 10px;
+  color: #000;
+}
+
+table.crossword td .letter {
+  line-height: 30px;
+  color: rgb(12, 6, 6);
+}
+
+table.crossword td.cell-empty {
+  background: #444;
+  width: 30px; 
+  height: 30px; 
+  border: 1px solid #777;
+}
+
+.cell .letter {
+  display: block;
+  width: 100%;
+  height: 100%;
+  line-height: 30px;
+  font-size: 18px;
+  text-transform: uppercase;
+}
+
+.cell .cluenumber {
+  position: absolute;
+  top: 2px;
+  left: 3px;
+  font-size: 10px;
+  font-weight: bold;
+}
+
+/* Optional: Highlight selected word */
+.cell.highlight {
+  background-color: #ffef99 !important;
+}
+
+.sec {
+  width: 90%;
+  max-width: 780px;
+  margin: 1.5rem auto;
+  display: flex;
+  flex-wrap: wrap;
+  border-radius: 16px;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+  background: #fff;
+}
+
+
+.crossword-result {
+  font-family: 'Inter', sans-serif;
+  display: flex;
+  gap: 1rem;
+}
+
+.crossword-result .score-card {
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  padding: 2rem;
+  flex: 0 0 250px;
+  text-align: center;
+}
+
+.crossword-result .answers-card {
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  padding: 1.5rem;
+  flex: 1;
+  overflow-y: auto;
+}
+
+.crossword-result .answers-section-title {
+  font-weight: 600;
+  font-size: 1.1rem;
+  border-bottom: 1px solid #eee;
+  padding-bottom: .5rem;
+  margin-bottom: 1rem;
+}
+
+.crossword-result .answer-item {
+  border-left: 4px solid #f15a24;
+  border-radius: 8px;
+  background: #fafafa;
+  padding: 1rem;
+  margin-bottom: 1rem;
+}
+
+.crossword-result .answer-item .user-answer {
+  font-family: var(--crossword-font, 'Inter');
+  font-size: 1.2rem;
+  color: #0077cc;
+  margin-top: .5rem;
+}
+
+.result-section {
+  display: flex;
+  gap: 2rem;
+  background: #f2f4f8;
+  border-radius: 12px;
+  padding: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.left-card {
+  flex: 1;
+  min-width: 260px;
+  background: white;
+  border-radius: 16px;
+  padding: 1.5rem;
+  text-align: center;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.lc-title {
+  margin: 0;
+  font-size: 1.5rem;
+}
+
+.lc-sub {
+  color: #666;
+}
+
+.lc-ring {
+  position: relative;
+  display: inline-block;
+  margin: 1rem 0;
+  width: 140px;
+  height: 140px;
+  border-radius: 50%;
+  background: conic-gradient(#4a7aff ${score}% , #dce2ee 0);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.lc-score {
+  font-size: 3rem;
+  font-weight: bold;
+}
+
+.lc-total {
+  font-size: 1rem;
+  color: #666;
+}
+
+.lc-grade {
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin-top: .5rem;
+}
+
+.right-card {
+  flex: 2;
+  min-width: 300px;
+  background: white;
+  border-radius: 16px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  overflow-y: auto;
+  max-height: 80vh;
+}
+
+.rc-header {
+  border-bottom: 2px solid #ddd;
+  margin-bottom: 1rem;
+}
+
+.rc-section {
+  background: #f7f7f7;
+  padding: .4rem .8rem;
+  border-radius: 6px;
+  margin-top: 1rem;
+  font-weight: bold;
+}
+
+.rc-item {
+  margin: .8rem 0;
+  padding: .6rem;
+  border-radius: 6px;
+  background: #fafafa;
+}
+
+.rc-item.correct {
+  border-left: 5px solid #4CAF50;
+}
+
+.rc-item.wrong {
+  border-left: 5px solid #f44336;
+}
+
+.rc-question {
+  font-weight: 600;
+  margin-bottom: .4rem;
+}
+
+.rc-answer {
+  font-size: .95rem;
+}
+
+.user-answer {
+  margin-right: .5rem;
+  color: #333;
+}
+
+.correct-answer {
+  color: #4a7aff;
+  font-style: italic;
+}
+
+.empty {
+  color: #aaa;
+  font-style: italic;
+}
+
+.reaction {
+  background-color: #fff5f5;
+}
+
+.verbal {
+  background-color: #f2f8f6;
+}
+
+.reaction p:first-of-type {
+  color: #e03131;
+}
+
+.verbal p:first-of-type {
+  color: #087f5b;
+}
+
+.sec {
+  animation: fadeIn 0.4s ease-out;
+}
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Leaderboard Styling */
+.leaderboard {
+  width: 100%;
+  border-radius: 12px;
+  overflow: hidden;
+  font-family: 'Inter', sans-serif;
+}
+
+.leaderboard-header {
+  background-color: #2f323a;
+  color: snow;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0.8rem 1rem;
+  font-weight: 600;
+  border-top-left-radius: 12px;
+  border-top-right-radius: 12px;
+}
+.leaderboard-header h4,
+h4.titlehasil {
+  color: snow;
+  display: inline-block;
+  margin-left: 4px;
+  font-size: 20px;
+  text-align: center;
+}
+.leaderboard-icon {
+  font-size: 1.2rem;
+}
+
+.leaderboard-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.leaderboard-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.8rem 1rem;
+  color: #fff;
+  font-weight: 500;
+}
+
+.leaderboard-item .rank {
+  font-weight: 600;
+  margin-right: 0.4rem;
+}
+
+.leaderboard-item .score {
+  font-weight: 600;
+}
+
+.leaderboard-item.empty {
+  text-align: center;
+  color: #ccc;
+  background: #444;
+}
+
+/* Gradient per rank */
+.rank-1 { background: #fa6855; }
+.rank-2 { background: #e0574f; }
+.rank-3 { background: #d7514d; }
+.rank-4 { background: #cd4b4b; }
+.rank-5 { background: #c24448; }
+.leaderboard-item:not(.rank-1):not(.rank-2):not(.rank-3):not(.rank-4):not(.rank-5) {
+  background: #a83232;
+}
+
+/* Rounded bottom */
+.leaderboard-item:last-child {
+  border-bottom-left-radius: 12px;
+  border-bottom-right-radius: 12px;
+}
+
+.accordion-button:after {
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='white'%3e%3cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3e%3c/svg%3e");
+}
+.accordion-button:not(.collapsed):after{
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='white'%3e%3cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3e%3c/svg%3e");
+}
+.accordion-button.collapsed {
+    border-bottom-left-radius: 10px!important;
+    border-bottom-right-radius: 10px!important;
+}
+.crosswordholder.fade-out {
+  animation: fadeOutScale 0.6s ease forwards;
+}
+@keyframes fadeOutScale {
+  0% { opacity: 1; transform: scale(1); }
+  100% { opacity: 0; transform: scale(0.95); }
+}
+
+/* Slide up clue panel when disappearing */
+#clueplayground.slide-up {
+  animation: slideUpFade 0.5s ease forwards;
+}
+@keyframes slideUpFade {
+  0% { opacity: 1; transform: translateY(0); }
+  100% { opacity: 0; transform: translateY(-20px); height: 0; overflow: hidden; }
+}
+
+/* Fade and scale in result */
+.result-appear {
+  animation: fadeInScale 0.7s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+}
+@keyframes fadeInScale {
+  0% { opacity: 0; transform: scale(0.9); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+/* Bounce for score number */
+@keyframes bounceIn {
+  0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+  40% { transform: translateY(-15px); }
+  60% { transform: translateY(-8px); }
+}
+.lc-score.bounce {
+  animation: bounceIn 1s ease;
+}
+
+/* Result layout */
+.result-section {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  margin-top: 1.5rem;
+}
+.left-card {
+  flex: 1 1 250px;
+  background: var(--tblr-card-bg, #fff);
+  border-radius: 1rem;
+  padding: 1.5rem;
+  text-align: center;
+  box-shadow: var(--tblr-shadow, 0 2px 6px rgba(0,0,0,0.1));
+}
+.right-card {
+  flex: 2 1 400px;
+  background: var(--tblr-card-bg, #fff);
+  border-radius: 1rem;
+  padding: 1.5rem;
+  box-shadow: var(--tblr-shadow, 0 2px 6px rgba(0,0,0,0.1));
+}
+.lc-ring {
+  display: flex;
+  justify-content: center;
+  align-items: baseline;
+  font-size: 3rem;
+  margin: 1rem 0;
+}
+.lc-score { font-weight: bold; color: var(--tblr-primary, #206bc4); }
+.lc-total { font-size: 1.5rem; color: #777; margin-left: 0.3rem; }
+.lc-grade { font-size: 1.5rem; margin-top: 0.5rem; font-weight: 600; }
+.rc-item { margin-bottom: 1rem; padding: 0.5rem 0.75rem; border-radius: 0.5rem; background: #f8f9fa; }
+.rc-item.correct { border-left: 5px solid #2fb344; }
+.rc-item.wrong { border-left: 5px solid #d63939; }
+.rc-question { font-weight: 600; margin-bottom: 0.25rem; }
+.rc-answer span { display: inline-block; margin-right: 0.5rem; }
+</style>
+{% endblock %}
+{% block isendpage %}</div>{% endblock %}

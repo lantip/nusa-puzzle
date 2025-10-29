@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="card">
+  <div class="card-header d-flex justify-content-between align-items-center">
+    <h3 class="card-title">{{ crossword.title }}</h3>
+    <div>
+      <a href="{{ url_for('admin_edit', id=crossword.id) }}" class="btn btn-warning btn-sm me-2">
+        Edit
+      </a>
+      <a href="{{ url_for('admin_publish', id=crossword.id) }}" class="btn btn-success btn-sm">
+        Publish
+      </a>
+    </div>
+  </div>
+
+  <div class="card-body text-center">
+    <!-- crossword grid -->
+    <div id="crossword-grid" class="d-inline-block my-3">
+        <h4>🧠 Crossword Preview</h4>
+        <div style="display: inline-block; border: 2px solid #333;">
+            <table style="border-collapse: collapse;">
+            {% for row in preview %}
+            <tr>
+                {% for cell in row %}
+                {% if cell == ' ' %}
+                <td style="width: 28px; height: 28px; background: #999; border: 1px solid #777;"></td>
+                {% else %}
+                <td class="cell" style="width: 28px; height: 28px; border: 1px solid #777; text-align: center;">
+                    <div class="letter">{{ cell }}</div>
+                </td>
+                {% endif %}
+                {% endfor %}
+            </tr>
+            {% endfor %}
+            </table>
+        </div>
+
+    </div>
+
+    <!-- word clues -->
+    <div class="mt-4 text-start mx-auto" style="max-width:700px;">
+      <h5>Clues</h5>
+      <ul class="list-group">
+        {% for word, clue in words.items() %}
+        <li class="list-group-item d-flex justify-content-between align-items-center">
+          <strong>{{ word }}</strong>
+          <span>{{ clue }}</span>
+        </li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+</div>
+
+<style>
+.crossword-table {
+  border-collapse: collapse;
+  margin: 0 auto;
+  box-shadow: 0 0 6px rgba(0,0,0,0.1);
+}
+.crossword-cell {
+  width: 36px;
+  height: 36px;
+  border: 1px solid #999;
+  text-align: center;
+  vertical-align: middle;
+  font-family: monospace;
+  font-size: 20px;
+  font-weight: bold;
+}
+.crossword-empty {
+  background-color: #ccc;
+}
+.crossword-filled {
+  background-color: #fff;
+}
+</style>
+
+{% if crossword.font_file %}
+<style>
+@font-face {
+  font-family: '{{ crossword.font_file.split("__")[-1].rsplit(".", 1)[0] }}';
+  src: url('{{ url_for("static", filename="font/" + crossword.font_file) }}');
+}
+strong, .cell .letter {
+  font-family: '{{ crossword.font_file.split("__")[-1].rsplit(".", 1)[0] }}', sans-serif;
+}
+</style>
+{% endif %}
+
+{% endblock %}

@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Teka-teki Silang.</title>
+    <!-- CSS files -->
+    <link href="{{ url_for('static', filename='css/tabler.min.css') }}" rel="stylesheet" />
+    <link href="{{ url_for('static', filename='css/tabler-flags.min.css') }}" rel="stylesheet" />
+    <link href="{{ url_for('static', filename='css/tabler-socials.min.css') }}" rel="stylesheet" />
+    <link href="{{ url_for('static', filename='css/tabler-vendors.min.css') }}" rel="stylesheet" />
+    <link href="{{ url_for('static', filename='css/tabler-marketing.min.css') }}" rel="stylesheet" />
+    <link href="{{ url_for('static', filename='css/swiper.css') }}" rel="stylesheet">
+    <style>
+        @import url('https://rsms.me/inter/inter.css');
+    </style>
+</head>
+
+<body class="{% block bodyclass %}body-marketing body-gradient{% endblock %}">
+    {% block ispage %}{% endblock %}
+    <header class="navbar navbar-expand-lg {% block navbarhome %}navbar-transparent{% endblock %} py-0">
+        <div class="container">
+            <a href="/" class="navbar-brand navbar-brand-autodark">
+                <img src="{{ url_for('static', filename='logo.svg')}}" style="height: 28px" alt="Nusa Puzzle" />
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarTogglerDemo01" aria-controls="navbarTogglerDemo01" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarTogglerDemo01">
+                <nav class="navbar-nav ms-auto">
+                    <div class="nav-item {% if request.path == "/" %}active{% endif %}">
+                        <a class="nav-link {% if request.path == "/" %}active{% endif %}" href="/"><span class="nav-link-title">Beranda</span></a>
+                    </div>
+                    <div class="nav-item {% if request.path == "/list-games" %}active{% endif %}">
+                        <a class="nav-link {% if request.path == "/list-games" %}active{% endif %}" href="/list-games"><span class="nav-link-title">Daftar Game</span></a>
+                    </div>
+                    <div class="nav-item {% if request.path == "/hall-of-fame" %}active{% endif %}">
+                        <a class="nav-link {% if request.path == "/hall-of-fame" %}active{% endif %}" href="/hall-of-fame"><span class="nav-link-title">Papan Jawara</span></a>
+                    </div>
+                    <div class="nav-item {% if request.path == "/about" %}active{% endif %}">
+                        <a class="nav-link {% if request.path == "/about" %}active{% endif %}" href="/about"><span class="nav-link-title">Tentang</span></a>
+                    </div>
+                    {% if not current_user.is_authenticated %}
+                    <div class="nav-item ms-4">
+                        <a href="/login" class="btn btn-primary">Login</a>
+                    </div>
+                    {% else %}
+                        <div class="nav-item dropdown">
+                            <a href="#" class="nav-link d-flex lh-1 text-reset p-0" data-bs-toggle="dropdown" aria-label="Open user menu">
+                                <span class="avatar avatar-sm" style="background-image: url('https://i.pravatar.cc/150?u={{current_user.username}}')"></span>
+                                <div class="d-none d-xl-block ps-2">
+                                    <div>{{current_user.username}}</div>
+                                </div>
+                            </a>
+                            <div class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
+                                <a href="/logout" class="dropdown-item">Logout</a>
+                            </div>
+                        </div>
+                    {% endif %}
+                </nav>
+            </div>
+        </div>
+    </header>
+    {% block headertwo %}
+    {% endblock %}
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+        {% for msg in messages %}
+            <div class="alert alert-info">{{ msg }}</div>
+        {% endfor %}
+        {% endif %}
+    {% endwith %}
+    {% block content %}
+    {% endblock %}    
+    <footer class="footer">
+        <div class="container">
+            <div class="py-3 border-top-light text-center text-lg-start">
+                <div class="row g-4">
+                    <div class="col-lg-auto text-lg-end order-lg-last">
+                        <div class="row justify-center">
+                            <div class="col-auto">
+                                ©<a href="https://lantip.xyz" class="link-muted" target="_blank" rel="noopener noreferrer">lantip</a>
+                            </div>
+                            <div class="col-auto">
+                                <ul class="list-inline list-inline-dots">
+                                    <li class="list-inline-item">
+                                        <a class="link-muted" href="/terms-of-service">Syarat dan Ketentuan</a>
+                                    </li>
+                                    <li class="list-inline-item">
+                                        <a class="link-muted" href="/privacy-policy">Privasi</a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg">
+                        Made with
+                        <!-- Download SVG icon from http://tabler.io/icons/icon/heart -->
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon text-red icon-inline">
+                            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                            <path d="M19.5 12.572l-7.5 7.428l-7.5 -7.428a5 5 0 1 1 7.5 -6.566a5 5 0 1 1 7.5 6.572" /></svg>
+                        in Yogyakarta.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+    {% block isendpage %}{% endblock %}
+    <!-- Libs JS -->
+    {% block libscript %}
+    {% endblock %}
+    <!-- Tabler Core -->
+    <script src="{{ url_for('static', filename='js/tabler.min.js') }}" defer></script>
+    {% block endscript %}
+    {% endblock %}
+    {% block styles %}
+    {% endblock %}
+</body>
+
+</html>

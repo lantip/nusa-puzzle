@@ -40,65 +40,54 @@ Built with ❤️ using **Flask**, **SQLite**, and **Tabler CSS**, this project 
 
 ---
 
-## 📦 Requirements
+## ⚙️ Setup
 
-Make sure you have **Python 3.9+** installed.
-
-### Dependencies
-
-All dependencies are managed via **Pipenv**:
+### 1️⃣ Install dependencies
 
 ```bash
-pip install pipenv
-pipenv install
+pip install -r requirements.txt
 ```
 
-If you’re not using Pipenv, you can install manually:
+### 2️⃣ Initialize the database
 
 ```bash
-pip install flask sqlalchemy flask-login flask-migrate flask-bcrypt
+flask db upgrade
 ```
 
-Optional but recommended:
+### 3️⃣ Run the app in development mode
 
 ```bash
-pip install pillow
+flask run
 ```
+
+Or using Gunicorn for production:
+
+```bash
+gunicorn -w 4 -b 0.0.0.0:8000 app:app
+```
+
+You can also manage it using **Supervisor** for background running.
 
 ---
 
-## ⚙️ Configuration
+## 🧑‍💻 Admin Account
 
-1. Clone the repository:
+When the application starts for the first time, it automatically creates a default administrator account:
 
-   ```bash
-   git clone https://github.com/lantip/nusa-puzzle.git
-   cd nusa-puzzle
-   ```
+```
+Username: admin  
+Password: admin
+```
 
-2. Initialize the environment:
+For security reasons, **you must change this password immediately** after setup.
 
-   ```bash
-   pipenv shell
-   ```
+To update the admin password, use the helper script below:
 
-3. Set up the database:
+```bash
+python change_admin_password.py
+```
 
-   ```bash
-   flask db upgrade
-   ```
-
-4. Run the app:
-
-   ```bash
-   flask run
-   ```
-
-5. Visit:
-
-   ```
-   http://127.0.0.1:5000
-   ```
+You will be prompted to enter and confirm a new password securely in the terminal.
 
 ---
 
@@ -112,6 +101,7 @@ pip install pillow
 │   └── generator.py
 ├── models.py
 ├── utils.py
+├── change_admin_password.py
 ├── static/
 │   ├── css/
 │   ├── font/

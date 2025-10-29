@@ -1,4 +1,6 @@
-# utils/crossword_from_github.py
+"""
+Modified version of Crossword generator from https://github.com/sealhuang/pycrossword
+"""
 import random
 import time
 from collections import defaultdict

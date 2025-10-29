@@ -3,6 +3,19 @@
 <head>
   <meta charset="UTF-8">
   <title>{{ title or "TTS Admin" }}</title>
+  <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://tts.lantip.xyz/" />
+    <meta property="og:title" content="Teka-teki Silang Aksara Nusantara" />
+    <meta property="og:description" content="Belajar dan bermain Aksara Nusantara — buat dan mainkan Teka-teki Silang beraksara Jawa, Sunda, Bali, Pegon, dan lainnya." />
+    <meta property="og:image" content="{{ url_for('static', filename='img/tts-01.png', _external=True) }}" />
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image" />
+    <meta property="twitter:url" content="https://tts.lantip.xyz/" />
+    <meta property="twitter:title" content="Teka-teki Silang Aksara Nusantara" />
+    <meta property="twitter:description" content="Belajar dan bermain Aksara Nusantara — buat dan mainkan Teka-teki Silang beraksara Nusantara apa saja." />
+    <meta property="twitter:image" content="{{ url_for('static', filename='img/tts-01.png', _external=True) }}" />
+
   <link href="{{ url_for('static', filename='favicon.png') }}" rel="icon">
   <link href="{{ url_for('static', filename='favicon.png') }}" rel="apple-touch-icon">
     <link href="{{ url_for('static', filename='css/tabler.min.css') }}" rel="stylesheet" />

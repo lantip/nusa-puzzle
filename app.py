@@ -427,6 +427,14 @@ def submit_crossword_answers(crossword_id):
     answers = request.json.get('answers', [])
     guest_name = request.json.get('guest_name', '').strip() or 'Guest'
 
+
+    inputed_answers = [a['answer'].strip() for a in answers]
+    inputed_answers = "".join(inputed_answers)
+    if len(inputed_answers) < 1:
+        return jsonify(
+            {'success': False, 
+            "message": "Belum ada jawaban yang dikirim"}
+        )
     grid = json.loads(crossword.grid)
     numbering = assign_clue_numbers(grid, words, empty=' ')
 
@@ -466,11 +474,6 @@ def submit_crossword_answers(crossword_id):
         })
 
     score = round((correct / total) * 100) if total else 0
-    if score < 1:
-        return jsonify(
-            {'success': False, 
-            "message": "Belum ada jawaban yang dikirim"}
-        )
     grade = 'MANTAP JAYA!' if score >= 90 else 'KEREN!' if score >= 75 else 'LUMAYAN!' if score >= 50 else 'SEMANGAT!'
     remark = (
         'Sempurna banget! Kamu jago teka-teki silang nih' if score >= 90 else

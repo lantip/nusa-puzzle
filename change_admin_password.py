@@ -1,6 +1,6 @@
 from werkzeug.security import generate_password_hash
-from app import app, db
-from models import User 
+from app import app
+from models import User, db
 
 def change_admin_password(new_password):
     with app.app_context():

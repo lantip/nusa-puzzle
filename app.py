@@ -280,12 +280,18 @@ def play_crossword(author_username, slug):
         if current_user.is_authenticated:
             return redirect('/admin')
         return redirect('/')
+
     grid = json.loads(crossword.grid)
     words = json.loads(crossword.words)
-    #scores = Score.query.filter_by(crossword_id=crossword.id).order_by(Score.score.desc()).limit(5).all()
+
     identity = case(
-        (Score.user_id.isnot(None), func.concat('user_', func.cast(Score.user_id, db.String))),
-        else_=func.concat('guest_', func.coalesce(Score.guest_token, ''), '_', func.coalesce(Score.guest_name, ''))
+        (
+            Score.user_id.isnot(None),
+            ('user_' + func.cast(Score.user_id, db.String))
+        ),
+        else_=(
+            'guest_' + func.coalesce(Score.guest_token, '') + '_' + func.coalesce(Score.guest_name, '')
+        )
     )
 
     ranked = (
@@ -316,7 +322,6 @@ def play_crossword(author_username, slug):
                 user_id=current_user.id,
                 score=score_value
             )
-
         else:
             if 'guest_token' not in session:
                 session['guest_token'] = str(uuid.uuid4())
@@ -334,6 +339,7 @@ def play_crossword(author_username, slug):
         db.session.commit()
         flash('Your score has been recorded!')
         return redirect(url_for('play_crossword', author_username=author_username, slug=slug))
+
     guest_name = session.get('guest_name', '')
 
     numbering = assign_clue_numbers(grid, words, empty=' ')
@@ -356,7 +362,8 @@ def play_crossword(author_username, slug):
         "across": numbering["across"],
         "down": numbering["down"]
     }
-    num_map = {} 
+
+    num_map = {}
     for c in numbering['clues']:
         key = (int(c['row']), int(c['col']), True if c['orientation'] == 'down' else False)
         num_map[key] = int(c['number'])

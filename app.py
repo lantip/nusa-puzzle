@@ -272,6 +272,7 @@ def view_crossword(id):
         words=words
     ) 
 
+
 @app.route('/cw-<author_username>/<slug>', methods=['GET', 'POST'])
 def play_crossword(author_username, slug):
     crossword = Crossword.query.filter_by(author_username=author_username, slug=slug).first_or_404()
@@ -389,50 +390,112 @@ def play_crossword(author_username, slug):
                 'vertical': bool(vert),
                 'number': number
             })
-
-    words = annotated_words
+    safe_words = []
+    for w in words:
+        if isinstance(w, dict):
+            row = int(w.get('row', 0))
+            col = int(w.get('col', 0))
+            vert = bool(w.get('vertical', False))
+            number = num_map.get((row, col, vert))
+        else:
+            word_text, clue_text, row, col, vert = w[0], w[1], w[2], w[3], w[4]
+            number = num_map.get((int(row), int(col), bool(vert)))
+        safe_words.append({
+            "number": number,
+            "clue": w["clue"],
+            "row": w["row"],
+            "col": w["col"],
+            "vertical": w["vertical"],
+            "length": len(w["word"])
+        })
     return render_template(
         'play/play.html',
         crossword=crossword,
         grid=grid,
-        words=words,
+        words=annotated_words,
+        words_meta=safe_words,
         guest_name=guest_name,
         scores=scores,
         numbers=number_grid,
         clues=clues
     )
 
-@app.route('/api/submit_score/<id>', methods=['POST'])
-def submit_score(id):
-    crossword = Crossword.query.filter_by(id=id).first_or_404()
-    data = request.get_json()    
-    score_value = data.get('score', 0)
-    if score_value < 1:
-        return jsonify({'success': True})
-    if current_user.is_authenticated:
-        new_score = Score(
-            crossword_id=crossword.id,
-            user_id=current_user.id,
-            score=score_value
+@app.post('/api/submit_answers/<int:crossword_id>')
+def submit_crossword_answers(crossword_id):
+    crossword = Crossword.query.get_or_404(crossword_id)
+    words = json.loads(crossword.words)
+    answers = request.json.get('answers', [])
+    guest_name = request.json.get('guest_name', '').strip() or 'Guest'
+
+    grid = json.loads(crossword.grid)
+    numbering = assign_clue_numbers(grid, words, empty=' ')
+
+    num_map = {}
+    for c in numbering['clues']:
+        key = (int(c['row']), int(c['col']), True if c['orientation'] == 'down' else False)
+        num_map[key] = int(c['number'])
+    answer_map = {(a['number'], a['dir']): a['answer'].upper().strip() for a in answers}
+
+    total = 0
+    correct = 0
+    details = []
+
+    for w in words:
+        if isinstance(w, dict):
+            row = int(w.get('row', 0))
+            col = int(w.get('col', 0))
+            vert = bool(w.get('vertical', False))
+            number = num_map.get((row, col, vert))
+        else:
+            word_text, clue_text, row, col, vert = w[0], w[1], w[2], w[3], w[4]
+            number = num_map.get((int(row), int(col), bool(vert)))
+        correct_word = w['word'].upper()
+        direction = 'down' if w['vertical'] else 'across'
+        user_answer = answer_map.get((number, direction), '').upper()
+        total += len(correct_word)
+        correct_count = sum(1 for i, ch in enumerate(correct_word) if i < len(user_answer) and user_answer[i] == ch)
+        correct += correct_count
+        is_correct = user_answer == correct_word
+        details.append({
+            'number': number,
+            'clue': w['clue'],
+            'dir': direction,
+            'correctWord': correct_word if not is_correct else '',
+            'userAnswer': user_answer,
+            'isCorrect': is_correct
+        })
+
+    score = round((correct / total) * 100) if total else 0
+    if score < 1:
+        return jsonify(
+            {'success': False, 
+            "message": "Belum ada jawaban yang dikirim"}
         )
+    grade = 'MANTAP JAYA!' if score >= 90 else 'KEREN!' if score >= 75 else 'LUMAYAN!' if score >= 50 else 'SEMANGAT!'
+    remark = (
+        'Sempurna banget! Kamu jago teka-teki silang nih' if score >= 90 else
+        'Keren! Hampir semua jawabannya benar' if score >= 75 else
+        'Lumayan! Masih bisa ditingkatin lagi' if score >= 50 else
+        'Yuk coba lagi, pasti bisa lebih bagus lain kali'
+    )
 
-    else:
-        if 'guest_token' not in session:
-            session['guest_token'] = str(uuid.uuid4())
-        guest_name = data.get('guest_name').strip() or 'Guest'
-        session['guest_name'] = guest_name
-
-        new_score = Score(
-            crossword_id=crossword.id,
-            guest_token=session['guest_token'],
-            guest_name=guest_name,
-            score=score_value
-        )
-
+    new_score = Score(
+        crossword_id=crossword.id,
+        user_id=current_user.id if current_user.is_authenticated else None,
+        guest_token=session.get('guest_token', str(uuid.uuid4())),
+        guest_name=guest_name,
+        score=score
+    )
     db.session.add(new_score)
     db.session.commit()
 
-    return jsonify({'success': True})
+    return jsonify({
+        'success': True,
+        'score': score,
+        'grade': grade,
+        'remark': remark,
+        'details': details
+    })
 
 
 @app.route('/api/scoreboard/<slug>')

@@ -148,66 +148,73 @@ function showResultWithAnimation(resultContainer, finalHTML) {
     const clueHolder = document.getElementById('clueplayground');
     crosswordHolder.classList.add('fade-out');
     clueHolder.classList.add('fade-out');
-
-
     setTimeout(() => {
-    crosswordHolder.innerHTML = '';
-    clueHolder.classList.add('d-none');
-    resultContainer.innerHTML = finalHTML;
-    resultContainer.classList.add('fade-in');
+        crosswordHolder.innerHTML = '';
+        clueHolder.classList.add('d-none');
+        resultContainer.innerHTML = finalHTML;
+        resultContainer.classList.add('fade-in');
     }, 600);
-}    
+}
+
 function createAlert({ type = 'danger', title = 'Error!', description = 'Something went wrong.' }) {
-  const wrapper = document.createElement('div');
-  wrapper.className = `alert alert-${type} alert-dismissible alertumum mb-3`;
-  wrapper.role = 'alert';
-
-  wrapper.innerHTML = `
-    <div class="d-flex">
-      <div>
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" 
-             viewBox="0 0 24 24" fill="none" stroke="currentColor" 
-             stroke-width="2" stroke-linecap="round" stroke-linejoin="round" 
-             class="icon alert-icon icon-2">
-          <path d="M3 12a9 9 0 1 0 18 0a9 9 0 0 0 -18 0" />
-          <path d="M12 8v4" />
-          <path d="M12 16h.01" />
-        </svg>
+    const wrapper = document.createElement('div');
+    wrapper.className = `alert alert-${type} alert-dismissible alertumum mb-3`;
+    wrapper.role = 'alert';
+    wrapper.innerHTML = `
+      <div class="d-flex">
+        <div>
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+               viewBox="0 0 24 24" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+               class="icon alert-icon icon-2">
+            <path d="M3 12a9 9 0 1 0 18 0a9 9 0 0 0 -18 0" />
+            <path d="M12 8v4" />
+            <path d="M12 16h.01" />
+          </svg>
+        </div>
+        <div>
+          <div class="alert-heading">${title}</div>
+          <div class="alert-description">${description}</div>
+        </div>
       </div>
-      <div>
-        <div class="alert-heading">${title}</div>
-        <div class="alert-description">${description}</div>
-      </div>
-    </div>
-    <a class="btn-close" data-bs-dismiss="alert" aria-label="close"></a>
-  `;
-
-  return wrapper;
+      <a class="btn-close" data-bs-dismiss="alert" aria-label="close"></a>
+    `;
+    return wrapper;
 }
 
 document.addEventListener('DOMContentLoaded', () => {
   const alertHolder = document.querySelector('.alertHolder');
-  const crosswordWords = {{ words|tojson | safe }};
+  const crosswordMeta = {{ words_meta|tojson | safe }}; 
   const wordsByNumber = {};
-  crosswordWords.forEach(w => {
+  crosswordMeta.forEach(w => {
     if (w.number !== undefined && w.number !== null) {
       wordsByNumber[String(w.number)] = w;
     }
   });
 
   function findWordByCoords(num, dir) {
-    if (wordsByNumber[String(num)]) {
-      const candidate = wordsByNumber[String(num)];
-      if ((dir === 'across' && !candidate.vertical) || (dir === 'down' && candidate.vertical)) {
-        return candidate;
-      }
+    const isAcross = dir.toLowerCase() === 'across';
+    const isDown = dir.toLowerCase() === 'down';
+
+    let match = crosswordMeta.find(w => {
+        const wnum = String(w.number);
+        const vertical = w.vertical === true || w.dir === 'down' || w.direction === 'down';
+        return wnum === String(num) && (
+        (isAcross && !vertical) ||
+        (isDown && vertical)
+        );
+    });
+
+    if (!match) {
+        match = crosswordMeta.find(w => String(w.number) === String(num));
     }
-    return crosswordWords.find(w => {
-      const r = Number(w.row);
-      const c = Number(w.col);
-      const v = !!w.vertical;
-      return w.number === num && ((dir === 'across' && !v) || (dir === 'down' && v));
-    }) || null;
+
+    if (!match) {
+        console.warn(`No word found for clue ${num} (${dir}). Check your words_meta keys.`);
+        console.table(crosswordMeta.slice(0, 5)); 
+    }
+
+    return match || null;
   }
 
   function clearHighlights() {
@@ -220,7 +227,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const row = Number(wordData.row);
     const col = Number(wordData.col);
     const vertical = !!wordData.vertical;
-    const length = wordData.word.length;
+    const length = wordData.length;
     const cells = [];
     for (let i = 0; i < length; i++) {
       const r = row + (vertical ? i : 0);
@@ -234,23 +241,9 @@ document.addEventListener('DOMContentLoaded', () => {
     return cells;
   }
 
-  // Inline input creation
   const inputBox = document.createElement('input');
   inputBox.type = 'text';
   inputBox.className = 'inline-input';
-  {% if crossword.font_file %}
-  Object.assign(inputBox.style, {
-    position: 'absolute',
-    zIndex: 10,
-    display: 'none',
-    border: '2px solid #007bff',
-    borderRadius: '4px',
-    textAlign: 'center',
-    fontFamily: '{{ crossword.font_file.split("__")[-1].rsplit(".", 1)[0] }}',
-    outline: 'none',
-  });
-  {% else %}
-
   Object.assign(inputBox.style, {
     position: 'absolute',
     zIndex: 10,
@@ -260,7 +253,6 @@ document.addEventListener('DOMContentLoaded', () => {
     textAlign: 'center',
     outline: 'none',
   });
-  {% endif %}
   document.body.appendChild(inputBox);
 
   let activeWord = null;
@@ -286,12 +278,12 @@ document.addEventListener('DOMContentLoaded', () => {
         inputBox.style.left = ((firstCellRect.left + window.scrollX) - ((firstCellRect.left)/4)) + 'px';
     } else {
         inputBox.style.left = firstCellRect.left + window.scrollX + 'px';
-    }    
+    }
     inputBox.style.top = firstCellRect.top + window.scrollY + 'px';
     inputBox.style.width = width + 'px';
     inputBox.style.height = height + 'px';
     inputBox.style.fontSize = '18px';
-    inputBox.maxLength = wordData.word.length;
+    inputBox.maxLength = wordData.length;
     inputBox.value = (wordData.userGuess || '').toUpperCase();
     inputBox.style.display = 'block';
     inputBox.focus();
@@ -304,32 +296,24 @@ document.addEventListener('DOMContentLoaded', () => {
       activeWord.userGuess = answer;
       const row = Number(activeWord.row);
       const col = Number(activeWord.col);
-      if (answer.length < activeWord.word.length) {
+      if (answer.length !== activeWord.length) {
         alertHolder.innerHTML = '';
         const alertBox = createAlert({
             type: 'danger',
             title: 'Perhatian:',
-            description: 'Jumlah karakter kurang!'
-        });
-        alertHolder.appendChild(alertBox);
-      } else if (answer.length > activeWord.word.length) {
-        alertHolder.innerHTML = '';
-        const alertBox = createAlert({
-            type: 'danger',
-            title: 'Perhatian:',
-            description: 'Jumlah karakter terlalu banyak!'
+            description: `Jumlah karakter harus ${activeWord.length}!`
         });
         alertHolder.appendChild(alertBox);
       } else {
         const vertical = !!activeWord.vertical;
-        for (let i = 0; i < activeWord.word.length; i++) {
-            const r = row + (vertical ? i : 0);
-            const c = col + (vertical ? 0 : i);
-            const cell = document.querySelector(`.cell[data-row="${r}"][data-col="${c}"]`);
-            if (cell) {
+        for (let i = 0; i < activeWord.length; i++) {
+          const r = row + (vertical ? i : 0);
+          const c = col + (vertical ? 0 : i);
+          const cell = document.querySelector(`.cell[data-row="${r}"][data-col="${c}"]`);
+          if (cell) {
             const letterDiv = cell.querySelector('.letter');
             if (letterDiv) letterDiv.textContent = answer[i] || '';
-            }
+          }
         }
       }
     }
@@ -341,7 +325,6 @@ document.addEventListener('DOMContentLoaded', () => {
   // Clue click
   document.querySelectorAll('.clue').forEach(clueEl => {
     clueEl.addEventListener('click', () => {
-      
       const number = parseInt(clueEl.dataset.num, 10);
       const dir = clueEl.dataset.dir;
       const wordData = findWordByCoords(number, dir);
@@ -350,7 +333,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const alertBox = createAlert({
             type: 'danger',
             title: 'Perhatian!',
-            description: 'Pertayaan tidak ada dalam daftar!'
+            description: 'Pertanyaan tidak ada dalam daftar!'
         });
         alertHolder.appendChild(alertBox);
         return;
@@ -376,20 +359,18 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // Scoring
+  // Secure Scoring via API
   document.getElementById('submit-answers').addEventListener('click', async () => {
-    let total = 0, correct = 0;
-
     {% if not current_user.is_authenticated %}
     const textAlertHolder = document.querySelector('.text_alert');
-    const alertHolder = document.querySelector('.alert_user');
+    const alertHolderUser = document.querySelector('.alert_user');
     const closeAlert = document.querySelector('.close_alert');
-    closeAlert.addEventListener("click", () => alertHolder.classList.add('d-none'));
+    closeAlert.addEventListener("click", () => alertHolderUser.classList.add('d-none'));
 
     const guestNameInput = document.querySelector('input[name="guest_name"]');
     if (guestNameInput && guestNameInput.value.trim() === '') {
         textAlertHolder.textContent = "Please enter your name before submitting!";
-        alertHolder.classList.remove('d-none');
+        alertHolderUser.classList.remove('d-none');
         guestNameInput.focus();
         return;
     }
@@ -398,43 +379,45 @@ document.addEventListener('DOMContentLoaded', () => {
     let guest_name = "{{current_user.username}}";
     {% endif %}
 
-    const crosswordEl = document.querySelector('.crosswordholder');
-    const clueHolder = document.getElementById("clueplayground");
     const resultContainer = document.getElementById('progressScore');
-    const alertScore = document.querySelector('.alertscore');    
 
+    // Build payload
+    const payload = {
+      guest_name: guest_name,
+      answers: crosswordMeta.map(w => ({
+        number: w.number,
+        dir: w.vertical ? 'down' : 'across',
+        answer: w.userGuess || ''
+      }))
+    };
 
-    if (!alertScore) {
-        location.reload();
-    }
-    // ===== SCORE CALCULATION =====
-    crosswordWords.forEach(w => {
-        if (w.word && w.word.trim() !== '') {
-        const userAnswer = (w.userGuess || '').trim();
-        const correctWord = w.word.toUpperCase();
-        const dir = w.vertical ? 'down' : 'across';
-
-        total += correctWord.length;
-        for (let i = 0; i < correctWord.length; i++) {
-            if ((userAnswer[i] || '').toUpperCase() === correctWord[i]) correct++;
-        }
-        }
+    const res = await fetch(`/api/submit_answers/{{ crossword.id }}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
     });
 
-    const score = total ? Math.round((correct / total) * 100) : 0;
-    const grade = score >= 90 ? 'MANTAP JAYA!' :
-                    score >= 75 ? 'KEREN!' :
-                    score >= 50 ? 'LUMAYAN!' : 'SEMANGAT!';
-    const remark = score >= 90 ? 'Sempurna banget! Kamu jago teka-teki silang nih' :
-                    score >= 75 ? 'Keren! Hampir semua jawabannya benar' :
-                    score >= 50 ? 'Lumayan! Masih bisa ditingkatin lagi' :
-                    'Yuk coba lagi, pasti bisa lebih bagus lain kali';
+    const data = await res.json();
+    if (!data.success) {
+      alertHolder.innerHTML = '';
+      const alertBox = createAlert({
+          type: 'danger',
+          title: 'Error',
+          description: data.message
+      });
+      alertHolder.appendChild(alertBox);
+      return;
+    }
 
-    // ===== BUILD LEFT SCORE CARD =====
+    // ===== BUILD RESULT UI =====
+    const score = data.score;
+    const grade = data.grade;
+    const remark = data.remark;
+
     const leftCard = `
         <div class="col-md-5">
         <div class="p-4 bg-white rounded-4 h-100 text-center d-flex flex-column justify-content-center">
-            <h3 class="fw-bold">Hai, {{ current_user.username if current_user.is_authenticated else 'Guest' }}!</h3>
+            <h3 class="fw-bold">Hai, ${guest_name}!</h3>
             <p class="text-muted mb-3">Kamu dapat skor</p>
             <div class="position-relative d-inline-block mb-3">
             <svg width="130" height="130">
@@ -454,75 +437,53 @@ document.addEventListener('DOMContentLoaded', () => {
         </div>
     `;
 
-    // ===== BUILD RIGHT ACCORDION =====
+    // Build clue lists
     const acrossItems = [];
     const downItems = [];
-
-    crosswordWords.forEach(w => {
-        if (w.word && w.word.trim() !== '') {
-        const userAnswer = (w.userGuess || '').trim();
-        const correctWord = w.word.toUpperCase();
-        const clueNum = w.number || '?';
-        const isCorrect = userAnswer.toUpperCase() === correctWord;
-        const symbol = isCorrect ? '✓' : '✗';
-        const color = isCorrect ? 'text-success' : 'text-danger';
-        const emptyLabel = userAnswer ? userAnswer : '<span class="fst-italic text-muted">(kosong)</span>';
-
+    data.details.forEach(w => {
+        const symbol = w.isCorrect ? '✓' : '✗';
+        const color = w.isCorrect ? 'text-success' : 'text-danger';
+        const emptyLabel = w.userAnswer ? w.userAnswer : '<span class="fst-italic text-muted">(kosong)</span>';
+        const correctText = !w.isCorrect ? `<div class="text-muted small fst-italic">${w.correctWord}</div>` : '';
         const itemHTML = `
             <div class="list-group-item list-group-item-action py-3">
             <div>
                 <span class="${color} me-2">${symbol}</span>
-                <strong>${clueNum}.</strong> ${w.clue}
+                <strong>${w.number}.</strong> ${w.clue}
                 <div class="small">${emptyLabel}</div>
-                ${!isCorrect ? `<div class="text-muted small fst-italic">${correctWord}</div>` : ''}
+                ${correctText}
             </div>
             </div>
         `;
-
-        if (w.vertical) downItems.push(itemHTML);
+        if (w.dir === 'down') downItems.push(itemHTML);
         else acrossItems.push(itemHTML);
-        }
     });
 
     const rightCard = `
         <div class="col-md-7">
         <div class="accordion" id="accordion-score">
-
-            <!-- Mendatar -->
             <div class="accordion-item mb-2">
             <h2 class="accordion-header">
                 <button class="accordion-button bg-dark text-white collapsed py-2" type="button"
-                        data-bs-toggle="collapse" data-bs-target="#collapse-across">
-                Mendatar
-                </button>
+                        data-bs-toggle="collapse" data-bs-target="#collapse-across">Mendatar</button>
             </h2>
             <div id="collapse-across" class="accordion-collapse collapse show">
-                <div class="list-group list-group-flush">
-                ${acrossItems.join('')}
-                </div>
+                <div class="list-group list-group-flush">${acrossItems.join('')}</div>
             </div>
             </div>
-
-            <!-- Menurun -->
             <div class="accordion-item">
             <h2 class="accordion-header">
                 <button class="accordion-button bg-success text-white collapsed py-2" type="button"
-                        data-bs-toggle="collapse" data-bs-target="#collapse-down">
-                Menurun
-                </button>
+                        data-bs-toggle="collapse" data-bs-target="#collapse-down">Menurun</button>
             </h2>
             <div id="collapse-down" class="accordion-collapse collapse">
-                <div class="list-group list-group-flush">
-                ${downItems.join('')}
-                </div>
+                <div class="list-group list-group-flush">${downItems.join('')}</div>
             </div>
             </div>
-
         </div>
         </div>
     `;
 
-    // ===== COMBINE BOTH INTO MAIN CARD =====
     const finalHTML = `
         <div class="card shadow-sm border-0 rounded-4 overflow-hidden" style="width: 95%">
         <div class="card-header bg-dark text-white d-flex align-items-center">
@@ -530,43 +491,15 @@ document.addEventListener('DOMContentLoaded', () => {
             <h4 class="mb-0 titlehasil">Hasil dan Jawaban</h4>
         </div>
         <div class="card-body bg-light">
-            <div class="row g-4">
-            ${leftCard}
-            ${rightCard}
-            </div>
+            <div class="row g-4">${leftCard}${rightCard}</div>
         </div>
         </div>
-    `;    
-
-    // ===== SEND SCORE TO BACKEND =====
-    if (score > 0) {
-        crosswordEl.classList.add('fade-out');
-        clueHolder.classList.add('slide-up');
-        //resultContainer.innerHTML = '';
-        //resultContainer.innerHTML = finalHTML;
-        showResultWithAnimation(resultContainer, finalHTML);
-        const params = { "guest_name": guest_name, "score": score };
-        const res = await fetch(`/api/submit_score/{{ crossword.id }}`, {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify(params)
-        });
-        const data = await res.json();
-        if (data.success) console.log('✅ Score submitted');
-        clueHolder.classList.add('d-none');
-    } else {
-        
-        alertHolder.innerHTML = '';
-        const alertBox = createAlert({
-            type: 'danger',
-            title: 'Error',
-            description: 'Anda belum menjawab satupun!'
-        });
-        alertHolder.appendChild(alertBox);
-    }
+    `;
+    showResultWithAnimation(resultContainer, finalHTML);
   });
 });
 </script>
+
 
 {% if crossword.font_file %}
 <style>

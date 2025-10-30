@@ -6,6 +6,17 @@ Teka-teki Silang
 {% block navbarhome %}{% endblock %}
 {% block content %}
 <div class="container mt-4">
+    <div class="row mb-3 border-bottom">
+      <div class="d-flex justify-content-between">
+        <div>
+            <h1 class="mb-0">{{ crossword.title }}</h1>
+            <p><small>oleh: {{ crossword.author_username }}</small></p>
+        </div>
+        <div>
+          <span class="btn btn-sm"> AKSARA &nbsp;<span class="badge bg-dark text-dark-fg">{% if crossword.font_file %}{% set aksara = crossword.font_file.split("__")[0] %}{{aksara|upper}}{% else %}LATIN{% endif %}</span></span>
+        </div>
+      </div>
+    </div>
     <div class="alertHolder"></div>
     <div class="row g-2">
       <div class="col-md-12 col-lg-8" id="progressScore">
@@ -34,11 +45,7 @@ Teka-teki Silang
             </table>
         </div>
       </div>
-      <div class="col-md-12 col-lg-4">
-        <div class="mb-3 border-bottom">
-            <h1 class="mb-0">{{ crossword.title }}</h1>
-            <p><small>oleh: {{ crossword.author_username }}</small></p>
-        </div>
+      <div class="col-md-12 col-lg-4">        
         <div id="clueplayground">
             <div class="accordion mb-3" id="clues-accross">
                 <div class="accordion-item">

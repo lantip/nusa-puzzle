@@ -30,6 +30,12 @@
       {% for crossword, plays in crosswords %}
       <div class="col-sm-4 col-lg-3">
         <div class="card">
+            {% if crossword.font_file %}
+            {% set aksara = crossword.font_file.split('__')[0] %}
+            <div class="ribbon bg-orange">AKSARA {{aksara|title}}</div>
+            {% else %}
+            <div class="ribbon bg-secondary">AKSARA LATIN</div>
+            {% endif %}
             <div class="img-responsive img-responsive-21x9 card-img-top"
                 style="background-image: url({{ url_for('crossword_preview', slug=crossword.slug) }})">
             </div>

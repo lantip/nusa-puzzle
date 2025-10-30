@@ -12,7 +12,6 @@
     <select id="fontPicker" class="form-select">
         <option value="">Default (Sans-serif)</option>
     </select>
-    <div id="unicodeHint" class="form-text text-muted mt-1"></div>
   </div>
   <h5>Word List</h5>
   <table class="table" id="wordTable">
@@ -43,26 +42,12 @@
 </div>
 
 <script>
-let selectedFontName = null;
-let currentUnicodeRange = null;
-let selectedUnicodeRange = null;
-const unicodeRanges = {
-    "jawa__nyk Ngayogyan New Italic.ttf": { name: "Aksara Jawa", start: 0xA980, end: 0xA9DF },
-    "sunda__AwiGombong.ttf": { name: "Aksara Sunda", start: 0x1B80, end: 0x1BBF },
-    "bali__vimala.ttf": { name: "Aksara Bali", start: 0x1B00, end: 0x1B7F },
-    "pegon__JAWI-Readex Pro-biasa.ttf": { name: "Aksara Pegon (Arab)", start: 0x0600, end: 0x06FF },
-    "kawi__Kawi Roman.ttf": { name: "Aksara Kawi", start: 0x11F00, end: 0x11F5F },
-    "rejang__kaganga-besemah.ttf": { name: "Aksara Rejang", start: 0xA930, end: 0xA95F },
-    "batak__Batak-Unicode-Regular Final.otf": { name: "Aksara Batak", start: 0x1BC0, end: 0x1BFF },
-    "lontara__AB tanraserri.ttf": { name: "Aksara Lontara (Bugis)", start: 0x1A00, end: 0x1A1F },
-    "jangang-jangang__Jangang-Jangang.otf": { name: "Aksara Jangang-jangang", start: 0x11EE0, end: 0x11EFF }
-};
-
+let selectedFontName = null; 
 
 function addRow() {
   const row = `
     <tr>
-      <td><input type="text" class="form-control word" placeholder="word" oninput="validateUnicode(this)"></td>
+      <td><input type="text" class="form-control word" placeholder="word"></td>
       <td><input type="text" class="form-control clue" placeholder="hint"></td>
       <td><button type="button" class="btn btn-danger btn-sm" onclick="removeRow(this)">✖</button></td>
     </tr>`;
@@ -98,7 +83,7 @@ async function generatePreview() {
 
   renderGrid(data.grid);
   document.getElementById('previewSection').style.display = 'block';
-  window.generatedCrossword = data;
+  window.generatedCrossword = data; // store for saving
 }
 
 function renderGrid(grid) {
@@ -156,11 +141,26 @@ async function saveCrossword() {
   }
 }
 
-
 document.addEventListener('DOMContentLoaded', async () => {
   await loadFontList();
   attachWordInputValidation();
 });
+
+function toTitleCase(str) {
+  if (!str) { 
+    return "";
+  }
+  return str
+    .toLowerCase() 
+    .split(' ') 
+    .map(word => { 
+      if (word.length === 0) { 
+        return "";
+      }
+      return word.charAt(0).toUpperCase() + word.slice(1);
+    })
+    .join(' '); 
+}
 
 function attachWordInputValidation() {
     document.querySelectorAll('.word').forEach(input => {
@@ -188,9 +188,8 @@ function showUnicodeWarning(input, badChar) {
     const hex = badChar.codePointAt(0).toString(16).toUpperCase();
     hint.innerHTML = `⚠️ Karakter "${badChar}" (U+${hex}) tidak termasuk dalam <strong>${selectedUnicodeRange.name}</strong>.
     Harap gunakan karakter dalam rentang U+${selectedUnicodeRange.start.toString(16).toUpperCase()} – U+${selectedUnicodeRange.end.toString(16).toUpperCase()}.`;
-    setTimeout(() => hint.innerHTML = "", 3000);
+    setTimeout(() => hint.innerHTML = "", 6000);
 }
-
 
 async function loadFontList() {
   const res = await fetch('/api/fonts');
@@ -205,34 +204,11 @@ async function loadFontList() {
     picker.appendChild(option);
   }
 
-  picker.addEventListener('change', async () => {
+  picker.addEventListener('change', () => {
     const selectedFile = picker.value;
-    if (selectedFile) {
-      await previewFont(selectedFile);
-      updateUnicodeRange(selectedFile);
-    } else {
-      document.body.style.removeProperty('--crossword-font');
-      currentUnicodeRange = null;
-    }
+    if (selectedFile) previewFont(selectedFile);
+    else document.body.style.removeProperty('--crossword-font');
   });
-}
-
-function updateUnicodeRange(fontFile) {
-  const lower = fontFile;
-  for (const [script, value] of Object.entries(unicodeRanges)) {
-    const range = [value['start'], value['end']]
-    if (lower.includes(script)) {
-      currentUnicodeRange = range;
-      selectedUnicodeRange = {
-        name: value["name"],
-        start: value['start'],
-        end: value['end']
-      }
-      console.log(`📜 Unicode range for ${value['name']}: U+${range[0].toString(16)}–U+${range[1].toString(16)}`);
-      return;
-    }
-  }
-  currentUnicodeRange = null;
 }
 
 async function previewFont(fontFile) {
@@ -243,7 +219,7 @@ async function previewFont(fontFile) {
     await font.load();
     document.fonts.add(font);
 
-    selectedFontName = fontName;
+    selectedFontName = fontName; 
 
     document.getElementById('crosswordContainer').style.setProperty('--crossword-font', fontName);
     console.log(`✅ Loaded font: ${fontName}`);
@@ -252,29 +228,7 @@ async function previewFont(fontFile) {
   }
 }
 
-function validateUnicode(input) {
-  if (!currentUnicodeRange) return;
-
-  const [min, max] = currentUnicodeRange;
-  const invalidChars = [...input.value].filter(ch => {
-    const code = ch.charCodeAt(0);
-    return code < min || code > max;
-  });
-
-  if (invalidChars.length > 0) {
-    input.classList.add('is-invalid');
-    input.title = `⚠ Only characters in U+${min.toString(16)}–U+${max.toString(16)} allowed for this font.`;
-  } else {
-    input.classList.remove('is-invalid');
-    input.title = '';
-  }
-}
-
-function toTitleCase(str) {
-  return str.replace(/\w\S*/g, w => w.charAt(0).toUpperCase() + w.substr(1).toLowerCase());
-}
 </script>
-
 <style>
   :root {
     --crossword-font: sans-serif;
@@ -285,10 +239,6 @@ function toTitleCase(str) {
     font-weight: bold;
     text-transform: uppercase;
     text-align: center;
-  }
-
-  .is-invalid {
-    border-color: red;
   }
 </style>
 {% endblock %}
